@@ -3,9 +3,9 @@ package com.mimicenzymes.schematichelper;
 import com.mimicenzymes.schematichelper.config.ConfigHandler;
 import com.mimicenzymes.schematichelper.config.Hotkeys;
 import com.mimicenzymes.schematichelper.core.AutoFillerStateMachine;
-import com.mimicenzymes.schematichelper.core.AutoSyncManager;
 import com.mimicenzymes.schematichelper.core.ContainerHighlighter;
 import com.mimicenzymes.schematichelper.core.SchematicChangeListener;
+import com.mimicenzymes.schematichelper.core.RealContainerCache; // 🚀 新增导入
 import com.mimicenzymes.schematichelper.input.Callbacks;
 import com.mimicenzymes.schematichelper.input.InputHandler;
 
@@ -16,7 +16,6 @@ import fi.dy.masa.malilib.interfaces.IInitializationHandler;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-// 🚀 修正：Events 在 v1 下，Context 才在 v1.world 下
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 
 public class SchematicHelperClient implements ClientModInitializer {
@@ -28,13 +27,11 @@ public class SchematicHelperClient implements ClientModInitializer {
             if (client.world != null) {
                 AutoFillerStateMachine.getInstance().tick(client);
                 SchematicChangeListener.tick(client);
-                // 🚀 补回这一行，不然掏空箱子后红框不亮！
-                AutoSyncManager.tick(client);
+                RealContainerCache.tick(client);
             }
         });
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            // 🚀 调用高亮渲染
             ContainerHighlighter.onRender(context);
         });
 
@@ -47,9 +44,7 @@ public class SchematicHelperClient implements ClientModInitializer {
             ConfigHandler configHandler = new ConfigHandler();
             configHandler.load();
             ConfigManager.getInstance().registerConfigHandler(MOD_ID, configHandler);
-
             InputEventHandler.getKeybindManager().registerKeybindProvider(InputHandler.getInstance());
-
             Hotkeys.OPEN_CONFIG_GUI.getKeybind().setCallback(Callbacks.getInstance());
             Hotkeys.FILL_CONTAINER.getKeybind().setCallback(Callbacks.getInstance());
             Hotkeys.TOGGLE_CONTINUOUS.getKeybind().setCallback(Callbacks.getInstance());

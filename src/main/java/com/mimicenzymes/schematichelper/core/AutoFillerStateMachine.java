@@ -55,7 +55,16 @@ public class AutoFillerStateMachine {
         this.shulkerExtractor = DependencyChecker.HAS_QUICK_SHULKER ? new QuickShulkerWrapper() : new DummyExtractor();
     }
 
+    // 🚀 核心修复 1：拦截积压任务，拒绝重复塞单！
     public void addTask(BlockPos pos, Map<Integer, ItemStack> requiredItems) {
+        // 如果当前正在处理这个箱子，无视新订单
+        if (currentTask != null && currentTask.targetPos.equals(pos)) return;
+
+        // 如果排队列表里已经有这个箱子了，无视新订单
+        for (FillTask t : taskQueue) {
+            if (t.targetPos.equals(pos)) return;
+        }
+
         taskQueue.add(new FillTask(pos, requiredItems));
     }
 
@@ -126,12 +135,10 @@ public class AutoFillerStateMachine {
                     if (shulkerSlot != -1) {
                         int trashSlot = findTrashSlotSafe(client, required.isEmpty() ? current : required, shulkerSlot);
                         if (trashSlot != -1) {
-                            sendFeedback(client, "§e背包已满，正在腾挪空间...", true);
                             queueFreeUpInventorySpace(client, shulkerSlot, trashSlot);
                             return;
                         }
                     }
-                    sendFeedback(client, "§c背包空间不足，无法清理容器", true);
                     reset(); return;
                 }
                 client.interactionManager.clickSlot(syncId, uiSlot, 0, SlotActionType.QUICK_MOVE, client.player);
@@ -158,14 +165,15 @@ public class AutoFillerStateMachine {
         }
 
         if (allMatched) {
-            // 🚀 核心修复：成功填充后立即标记，消除高亮红框
-            CompletedContainers.add(currentTask.targetPos);
+            // 🚀 核心修复 2：在机器人关上 GUI 的前一微秒，强制执行一次全局抓拍更新缓存！
+            // 彻底杜绝关箱子太快导致缓存没跟上的情况。
+            if (client.currentScreen instanceof HandledScreen<?> hs) {
+                RealContainerCache.updateFromScreen(client, hs);
+            }
 
             if (lastOpenedShulkerSlot != -1 && !borrowedItems.isEmpty()) {
-                sendFeedback(client, "§a填充完毕，正在归还借用物品...", true);
                 queueReturnBorrowedItems(client, lastOpenedShulkerSlot);
             } else {
-                sendFeedback(client, "§a填充完成！", true);
                 client.player.closeHandledScreen();
                 reset();
             }
@@ -177,6 +185,8 @@ public class AutoFillerStateMachine {
             client.player.sendMessage(Text.translatable(key), true);
         }
     }
+
+    // ... [中间的潜影盒和物品挪动逻辑保持不变] ...
 
     private void queueSmartShulkerExtraction(MinecraftClient client, int shulkerSlot, int itemInShulker, ItemStack targetItem) {
         List<Integer> emptyUiSlots = new ArrayList<>();
@@ -234,8 +244,6 @@ public class AutoFillerStateMachine {
                     client.interactionManager.clickSlot(h.syncId, itemInShulker, 0, SlotActionType.PICKUP, client.player);
                     client.interactionManager.clickSlot(h.syncId, uiTrashSlot, 0, SlotActionType.PICKUP, client.player);
                     client.interactionManager.clickSlot(h.syncId, itemInShulker, 0, SlotActionType.PICKUP, client.player);
-                } else {
-                    sendFeedback(client, "§c潜影盒内空间置换失败", true);
                 }
             }
         });
@@ -419,5 +427,9 @@ public class AutoFillerStateMachine {
         watchdogTimer = 0;
         borrowedItems.clear();
         lastOpenedShulkerSlot = -1;
+    }
+
+    public BlockPos getCurrentTaskPos() {
+        return currentTask != null ? currentTask.targetPos : null;
     }
 }

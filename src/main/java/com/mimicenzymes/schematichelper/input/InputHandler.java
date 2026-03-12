@@ -12,10 +12,8 @@ public class InputHandler implements IKeybindProvider {
 
     @Override
     public void addKeysToMap(IKeybindManager manager) {
-        // 🚀 复刻 Printer 架构：每次刷新时“重新宣示主权”
         for (ConfigHotkey hotkey : Hotkeys.HOTKEY_LIST) {
             manager.addKeybindToMap(hotkey.getKeybind());
-            // 关键：在这里重新挂载 Callback，确保改键后逻辑不丢
             hotkey.getKeybind().setCallback(Callbacks.getInstance());
         }
     }

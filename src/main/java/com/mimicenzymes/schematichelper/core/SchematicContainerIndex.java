@@ -1,50 +1,55 @@
 package com.mimicenzymes.schematichelper.core;
 
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.schematic.placement.SchematicPlacement;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
-import net.minecraft.block.BlockState;
+import fi.dy.masa.litematica.selection.Box;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
-
+import net.minecraft.util.math.Position;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SchematicContainerIndex {
     private static final List<BlockPos> CONTAINERS = new ArrayList<>();
-    private static boolean indexed = false;
 
     public static void rebuildIndex(MinecraftClient mc) {
         CONTAINERS.clear();
         SchematicCache.clear();
-
         var schematicWorld = SchematicWorldHandler.getSchematicWorld();
+        if (schematicWorld == null) return;
 
-        if (schematicWorld == null) {
-            indexed = false;
-            return;
-        }
+        List<SchematicPlacement> placements = DataManager.getSchematicPlacementManager().getAllSchematicsPlacements();
 
-        BlockPos.Mutable pos = new BlockPos.Mutable();
-        int min = -256;
-        int max = 256;
+        for (SchematicPlacement placement : placements) {
+            if (!placement.isEnabled()) continue;
+            Box box = placement.getEclosingBox();
+            if (box == null) continue;
 
-        for (int x = min; x <= max; x++) {
-            for (int y = -64; y <= 320; y++) {
-                for (int z = min; z <= max; z++) {
-                    pos.set(x, y, z);
-                    BlockState state = schematicWorld.getBlockState(pos);
+            BlockPos p1 = BlockPos.ofFloored((Position) box.getPos1());
+            BlockPos p2 = BlockPos.ofFloored((Position) box.getPos2());
 
-                    if (state.hasBlockEntity()) {
-                        CONTAINERS.add(pos.toImmutable());
+            int minX = Math.min(p1.getX(), p2.getX());
+            int maxX = Math.max(p1.getX(), p2.getX());
+            int minY = Math.min(p1.getY(), p2.getY());
+            int maxY = Math.max(p1.getY(), p2.getY());
+            int minZ = Math.min(p1.getZ(), p2.getZ());
+            int maxZ = Math.max(p1.getZ(), p2.getZ());
+
+            BlockPos.Mutable mPos = new BlockPos.Mutable();
+            for (int x = minX; x <= maxX; x++) {
+                for (int y = minY; y <= maxY; y++) {
+                    for (int z = minZ; z <= maxZ; z++) {
+                        mPos.set(x, y, z);
+                        if (schematicWorld.getBlockState(mPos).hasBlockEntity()) {
+                            CONTAINERS.add(mPos.toImmutable());
+                        }
                     }
                 }
             }
         }
-
         SpatialContainerIndex.rebuild(CONTAINERS);
-        indexed = true;
     }
 
-    public static List<BlockPos> getContainers() {
-        return CONTAINERS;
-    }
+    public static List<BlockPos> getContainers() { return CONTAINERS; }
 }

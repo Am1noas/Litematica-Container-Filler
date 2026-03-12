@@ -5,7 +5,6 @@ import com.mimicenzymes.schematichelper.config.GuiConfigs;
 import com.mimicenzymes.schematichelper.config.Hotkeys;
 import com.mimicenzymes.schematichelper.core.AreaScanner;
 import com.mimicenzymes.schematichelper.core.AutoFillerStateMachine;
-import com.mimicenzymes.schematichelper.core.CompletedContainers;
 import com.mimicenzymes.schematichelper.core.SchematicContainerReader;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
@@ -27,7 +26,6 @@ public class Callbacks implements IHotkeyCallback {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || action != KeyAction.PRESS) return false;
 
-        // 🚀 1.21 适配：直接比对实例，不比对字符串，告别找不到符号
         if (key == Hotkeys.OPEN_CONFIG_GUI.getKeybind()) {
             GuiBase.openGui(new GuiConfigs(null));
             return true;
@@ -57,8 +55,8 @@ public class Callbacks implements IHotkeyCallback {
             AreaScanner.executeScan(mc);
         } else if (mc.crosshairTarget instanceof BlockHitResult bhr) {
             BlockPos pos = bhr.getBlockPos();
-            CompletedContainers.remove(pos); // 强制破防
-            Map<Integer, ItemStack> items = SchematicContainerReader.getRequiredItems(pos, mc.world);
+            // 🚀 核心修复：传入 getRegistryManager() 而不是 mc.world
+            Map<Integer, ItemStack> items = SchematicContainerReader.getRequiredItems(pos, mc.world.getRegistryManager());
             if (items != null && !items.isEmpty()) {
                 AutoFillerStateMachine.getInstance().addTask(pos, items);
             }

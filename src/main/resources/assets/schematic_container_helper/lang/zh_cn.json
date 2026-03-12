@@ -93,6 +93,5 @@
   "schematic_container_helper.message.continuous_on": "§a[容器助手] 已开启持续填充",
   "schematic_container_helper.message.continuous_off": "§c[容器助手] 已关闭持续填充",
   "schematic_container_helper.message.mode_area": "§e[容器助手] 模式：范围扫描填充",
-  "schematic_container_helper.message.mode_single": "§e[容器助手] 模式：准星单体填充",
-
+  "schematic_container_helper.message.mode_single": "§e[容器助手] 模式：准星单体填充"
 }

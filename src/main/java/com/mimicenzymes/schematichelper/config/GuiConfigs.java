@@ -4,7 +4,6 @@ import com.mimicenzymes.schematichelper.SchematicHelperClient;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.gui.screen.Screen;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ public class GuiConfigs extends GuiConfigsBase {
         int x = 10;
         for (ConfigGuiTab t : ConfigGuiTab.values()) {
             String tabName = fi.dy.masa.malilib.util.StringUtils.translate("schematic_container_helper.gui.button." + t.name().toLowerCase());
-            fi.dy.masa.malilib.gui.button.ButtonGeneric b = new fi.dy.masa.malilib.gui.button.ButtonGeneric(x, 26, -1, 20, tabName);
+            ButtonGeneric b = new ButtonGeneric(x, 26, -1, 20, tabName);
             b.setEnabled(this.tab != t);
             this.addButton(b, (button, mouseButton) -> { this.tab = t; this.initGui(); });
             x += b.getWidth() + 2;
