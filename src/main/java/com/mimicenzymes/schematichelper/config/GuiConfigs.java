@@ -15,10 +15,7 @@ public class GuiConfigs extends GuiConfigsBase {
     private ConfigGuiTab tab = ConfigGuiTab.FEATURE;
 
     public GuiConfigs(Screen parent) {
-
-        // 把里面的 ModID 参数改成 "schematic_container_helper"
         super(10, 50, "schematic_container_helper", parent, "schematic_container_helper.gui.title.configs");
-
     }
 
     public void setTab(ConfigGuiTab tab) {
@@ -53,10 +50,11 @@ public class GuiConfigs extends GuiConfigsBase {
     @Override
     public List<ConfigOptionWrapper> getConfigs() {
         List<ConfigOptionWrapper> list = new ArrayList<>();
+        // 🚀 修改：去 Configs 和 Hotkeys 类里拿列表数据！
         if (this.tab == ConfigGuiTab.FEATURE) {
-            FeatureConfigs.OPTIONS.forEach(config -> list.add(new ConfigOptionWrapper(config)));
+            Configs.OPTIONS.forEach(config -> list.add(new ConfigOptionWrapper(config)));
         } else if (this.tab == ConfigGuiTab.HOTKEYS) {
-            FeatureConfigs.HOTKEYS.forEach(hotkey -> list.add(new ConfigOptionWrapper(hotkey)));
+            Hotkeys.HOTKEY_LIST.forEach(hotkey -> list.add(new ConfigOptionWrapper(hotkey)));
         }
         return list;
     }

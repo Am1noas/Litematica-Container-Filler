@@ -8,6 +8,26 @@
   "schematic_container_helper.config.name.enableMod": "启用模组",
   "schematic_container_helper.config.comment.enableMod": "开启或关闭容器助手的核心填充功能",
 
+  "continuousFill": "持续填充",
+  "config.name.continuousFill": "持续填充",
+  "schematic_container_helper.config.name.continuousFill": "持续填充",
+  "schematic_container_helper.config.comment.continuousFill": "开启后，模组将在后台自动持续寻找并填充容器",
+
+  "areaMode": "范围填充模式",
+  "config.name.areaMode": "范围填充模式",
+  "schematic_container_helper.config.name.areaMode": "范围填充模式",
+  "schematic_container_helper.config.comment.areaMode": "关闭: 仅填充准星指向的容器。开启: 自动扫描周围指定半径内的容器",
+
+  "fillRadius": "范围扫描半径",
+  "config.name.fillRadius": "范围扫描半径",
+  "schematic_container_helper.config.name.fillRadius": "范围扫描半径",
+  "schematic_container_helper.config.comment.fillRadius": "范围填充模式下的扫描半径 (1 - 32格)",
+
+  "syncLiteLayer": "跟随投影渲染层",
+  "config.name.syncLiteLayer": "跟随投影渲染层",
+  "schematic_container_helper.config.name.syncLiteLayer": "跟随投影渲染层",
+  "schematic_container_helper.config.comment.syncLiteLayer": "开启后，只会填充当前 Litematica 渲染层内的容器，忽略被隐藏的层",
+
   "highlightContainers": "高亮容器",
   "config.name.highlightContainers": "高亮容器",
   "schematic_container_helper.config.name.highlightContainers": "高亮容器",
@@ -28,10 +48,20 @@
   "schematic_container_helper.config.name.enableQsExtraction": "潜影盒提取",
   "schematic_container_helper.config.comment.enableQsExtraction": "允许模组自动打开背包内的潜影盒以提取所需材料",
 
-  "fillHotkey": "填充快捷键",
-  "config.name.fillHotkey": "填充快捷键",
-  "schematic_container_helper.config.name.fillHotkey": "填充快捷键",
-  "schematic_container_helper.config.comment.fillHotkey": "对着容器按此键开始自动同步投影清单并装填物品",
+  "fillHotkey": "手动填充快捷键",
+  "config.name.fillHotkey": "手动填充快捷键",
+  "schematic_container_helper.config.name.fillHotkey": "手动填充快捷键",
+  "schematic_container_helper.config.comment.fillHotkey": "按此键立即执行一次装填 (根据当前是准星还是范围模式决定)",
+
+  "toggleContinuous": "切换持续填充开关",
+  "config.name.toggleContinuous": "切换持续填充开关",
+  "schematic_container_helper.config.name.toggleContinuous": "切换持续填充开关",
+  "schematic_container_helper.config.comment.toggleContinuous": "热键开关：一键开启或关闭后台的“持续填充”功能",
+
+  "toggleMode": "切换准星/范围模式",
+  "config.name.toggleMode": "切换准星/范围模式",
+  "schematic_container_helper.config.name.toggleMode": "切换准星/范围模式",
+  "schematic_container_helper.config.comment.toggleMode": "热键切换：在“单体准星模式”与“群体范围模式”之间快速切换",
 
   "openConfigGui": "设置菜单热键",
   "config.name.openConfigGui": "设置菜单热键",

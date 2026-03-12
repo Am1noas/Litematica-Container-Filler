@@ -1,6 +1,7 @@
 package com.mimicenzymes.schematichelper.core;
 
-import com.mimicenzymes.schematichelper.config.FeatureConfigs;
+import com.mimicenzymes.schematichelper.config.ConfigHandler;
+import com.mimicenzymes.schematichelper.config.Configs;
 import com.mimicenzymes.schematichelper.dependency.DependencyChecker;
 import com.mimicenzymes.schematichelper.dependency.DummyExtractor;
 import com.mimicenzymes.schematichelper.dependency.IShulkerExtractor;
@@ -97,7 +98,7 @@ public class AutoFillerStateMachine {
 
     private void executeBurstFill(MinecraftClient client, ScreenHandler handler) {
         int syncId = handler.syncId;
-        int delay = FeatureConfigs.FILL_DELAY.getIntegerValue();
+        int delay = Configs.FILL_DELAY.getIntegerValue();
 
         if (!handler.getCursorStack().isEmpty()) {
             if (!tryPlaceCursorItem(client, handler)) {

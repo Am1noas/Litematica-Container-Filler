@@ -1,6 +1,6 @@
 package com.mimicenzymes.schematichelper.core;
 
-import com.mimicenzymes.schematichelper.config.FeatureConfigs;
+import com.mimicenzymes.schematichelper.config.Configs;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.malilib.util.data.Color4f;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
@@ -12,7 +12,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
-import org.lwjgl.opengl.GL11; // 直接使用最底层的臭阴OpenGL无视版本
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +23,10 @@ public class ContainerHighlighter {
     private static double lastX = 0, lastY = -100, lastZ = 0;
     private static int scanCooldown = 0;
 
+    // 🚀 就是这行被你不小心删掉了！现在加回来了
     public static void onRender(WorldRenderContext context) {
-        if (!FeatureConfigs.ENABLE_MOD.getBooleanValue() || !FeatureConfigs.HIGHLIGHT_CONTAINERS.getBooleanValue()) {
+        // 🚀 干净利落，旧的套娃代码已经删干净了
+        if (!Configs.ENABLE_MOD.getBooleanValue() || !Configs.HIGHLIGHT_CONTAINERS.getBooleanValue()) {
             return;
         }
 
@@ -47,11 +49,14 @@ public class ContainerHighlighter {
 
         MatrixStack matrices = context.matrices();
         Vec3d camPos = client.gameRenderer.getCamera().getPos();
-        Color4f color = Color4f.fromColor(FeatureConfigs.HIGHLIGHT_COLOR.getIntegerValue());
+        // 🚀 这里的颜色获取也修正为 Configs 了
+        Color4f color = Color4f.fromColor(Configs.HIGHLIGHT_COLOR.getIntegerValue());
         VertexConsumer buffer = context.consumers().getBuffer(RenderLayer.getLines());
+
         for (BlockPos pos : MISSING_LIST) {
             renderBox(matrices, buffer, pos, camPos, color);
         }
+
         if (context.consumers() instanceof VertexConsumerProvider.Immediate immediate) {
             GL11.glDisable(GL11.GL_DEPTH_TEST);
             immediate.draw(RenderLayer.getLines());
