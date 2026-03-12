@@ -15,7 +15,10 @@ public class GuiConfigs extends GuiConfigsBase {
     private ConfigGuiTab tab = ConfigGuiTab.FEATURE;
 
     public GuiConfigs(Screen parent) {
+
+        // 把里面的 ModID 参数改成 "schematic_container_helper"
         super(10, 50, "schematic_container_helper", parent, "schematic_container_helper.gui.title.configs");
+
     }
 
     public void setTab(ConfigGuiTab tab) {

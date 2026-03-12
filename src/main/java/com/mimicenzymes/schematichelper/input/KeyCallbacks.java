@@ -1,8 +1,10 @@
 package com.mimicenzymes.schematichelper.input;
 
 import com.mimicenzymes.schematichelper.config.FeatureConfigs;
+import com.mimicenzymes.schematichelper.config.GuiConfigs;
 import com.mimicenzymes.schematichelper.core.AutoFillerStateMachine;
 import com.mimicenzymes.schematichelper.core.SchematicContainerReader;
+import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
 import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
@@ -19,6 +21,15 @@ public class KeyCallbacks {
 
     public static void init() {
         FeatureConfigs.FILL_HOTKEY.getKeybind().setCallback(new FillContainerCallback());
+
+        FeatureConfigs.OPEN_CONFIG_GUI.getKeybind().setCallback((action, key) -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client.world != null && client.player != null) {
+                GuiBase.openGui(new GuiConfigs(null));
+                return true;
+            }
+            return false;
+        });
     }
 
     private static class FillContainerCallback implements IHotkeyCallback {
