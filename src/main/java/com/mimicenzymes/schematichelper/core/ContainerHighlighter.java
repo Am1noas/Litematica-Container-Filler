@@ -73,8 +73,22 @@ public class ContainerHighlighter {
             for (int y = -r; y <= r; y++) {
                 for (int z = -r; z <= r; z++) {
                     mutablePos.set(cx + x, cy + y, cz + z);
+
+                    // 🚀 1. 渲染层级过滤
+                    if (Configs.SYNC_LITE_LAYER.getBooleanValue() && !fi.dy.masa.litematica.data.DataManager.getRenderLayerRange().isPositionWithinRange(mutablePos)) {
+                        continue;
+                    }
+
+                    // 🚀 2. 已完成过滤
+                    if (Configs.HIDE_COMPLETED_CONTAINERS.getBooleanValue() && CompletedContainers.isCompleted(mutablePos)) {
+                        continue;
+                    }
+
                     if (!SchematicContainerReader.getRequiredItems(mutablePos, client.world).isEmpty()) {
                         MISSING_LIST.add(mutablePos.toImmutable());
+                    } else {
+                        // 顺便标记已满的容器
+                        CompletedContainers.add(mutablePos);
                     }
                 }
             }

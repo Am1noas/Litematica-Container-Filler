@@ -162,8 +162,10 @@ public class AutoFillerStateMachine {
         }
 
         if (allMatched) {
+            //填充完毕
+            CompletedContainers.add(currentTask.targetPos);
+
             if (lastOpenedShulkerSlot != -1 && !borrowedItems.isEmpty()) {
-                //归还物品
                 sendFeedback(client, "message.returning", true);
                 queueReturnBorrowedItems(client, lastOpenedShulkerSlot);
             } else {

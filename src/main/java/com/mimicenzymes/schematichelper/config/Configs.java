@@ -13,13 +13,14 @@ public class Configs {
     public static final ConfigBoolean AREA_MODE = new ConfigBoolean("areaMode", false, "Area mode");
     public static final ConfigInteger FILL_RADIUS = new ConfigInteger("fillRadius", 5, 1, 32, "Scan radius");
     public static final ConfigBoolean SYNC_LITE_LAYER = new ConfigBoolean("syncLiteLayer", true, "Sync layer");
-    public static final ConfigBoolean HIGHLIGHT_CONTAINERS = new ConfigBoolean("highlightContainers", true, "Highlight");
+    // 🚀 新增：隐藏已完成的容器
+    public static final ConfigBoolean HIDE_COMPLETED_CONTAINERS = new ConfigBoolean("hideCompletedContainers", true, "Hide completed");
     public static final ConfigColor HIGHLIGHT_COLOR = new ConfigColor("highlightColor", "0x808B4513", "Color");
     public static final ConfigInteger FILL_DELAY = new ConfigInteger("fillDelay", 0, 0, 100, "Delay");
     public static final ConfigBoolean ENABLE_QS_EXTRACTION = new ConfigBoolean("enableQsExtraction", true, "QS Extraction");
 
     public static final List<IConfigBase> OPTIONS = ImmutableList.of(
             ENABLE_MOD, CONTINUOUS_FILL, AREA_MODE, FILL_RADIUS,
-            SYNC_LITE_LAYER, HIGHLIGHT_CONTAINERS, HIGHLIGHT_COLOR, FILL_DELAY, ENABLE_QS_EXTRACTION
+            SYNC_LITE_LAYER, HIDE_COMPLETED_CONTAINERS, HIGHLIGHT_COLOR, FILL_DELAY, ENABLE_QS_EXTRACTION
     );
 }

@@ -13,5 +13,13 @@ public class SchematicChangeListener {
             lastSchematic = current;
             SchematicContainerIndex.rebuildIndex(mc);
         }
-    }
+
+        public static void tick(MinecraftClient mc) {
+            Object current = fi.dy.masa.litematica.world.SchematicWorldHandler.getSchematicWorld();
+            if (current != lastSchematic) {
+                lastSchematic = current;
+                SchematicContainerIndex.rebuildIndex(mc);
+                CompletedContainers.clear(); //切换蓝图时清空记录
+            }
+        }
 }
