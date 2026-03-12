@@ -37,9 +37,9 @@ public class AreaScanner {
             }
         }
 
-        // 🚀 扫描反馈
+        //扫描反馈
         if (count > 0) {
-            mc.player.sendMessage(Text.translatable("schematic_container_helper.message.scan_start", count), false);
+            mc.player.sendMessage(Text.translatable("schematic_container_helper.message.scan_start", count), true);
         }
     }
 }

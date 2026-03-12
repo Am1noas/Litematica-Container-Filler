@@ -11,22 +11,21 @@ public class Configs {
     public static final ConfigBoolean ENABLE_MOD = new ConfigBoolean("enableMod", true, "Enable mod");
     public static final ConfigBoolean CONTINUOUS_FILL = new ConfigBoolean("continuousFill", false, "Continuous fill");
     public static final ConfigBoolean AREA_MODE = new ConfigBoolean("areaMode", false, "Area mode");
-
-    // 自动填充的扫描半径
     public static final ConfigInteger FILL_RADIUS = new ConfigInteger("fillRadius", 5, 1, 32, "Scan radius");
-    // 🚀 新增：专门用于高亮渲染的视野半径（默认给大点，比如 15）
     public static final ConfigInteger RENDER_RADIUS = new ConfigInteger("renderRadius", 15, 1, 64, "Render radius");
-
     public static final ConfigBoolean SYNC_LITE_LAYER = new ConfigBoolean("syncLiteLayer", true, "Sync layer");
     public static final ConfigBoolean HIDE_COMPLETED_CONTAINERS = new ConfigBoolean("hideCompletedContainers", true, "Hide completed");
     public static final ConfigBoolean ENABLE_DATA_SYNC = new ConfigBoolean("enableDataSync", true, "Enable Data Sync");
     public static final ConfigBoolean HIGHLIGHT_CONTAINERS = new ConfigBoolean("highlightContainers", true, "Highlight");
+    public static final ConfigBoolean HIGHLIGHT_XRAY = new ConfigBoolean("highlightXray", true, "X-Ray Highlight");
     public static final ConfigColor HIGHLIGHT_COLOR = new ConfigColor("highlightColor", "0x808B4513", "Color");
     public static final ConfigInteger FILL_DELAY = new ConfigInteger("fillDelay", 0, 0, 100, "Delay");
     public static final ConfigBoolean ENABLE_QS_EXTRACTION = new ConfigBoolean("enableQsExtraction", true, "QS Extraction");
 
     public static final List<IConfigBase> OPTIONS = ImmutableList.of(
-            ENABLE_MOD, CONTINUOUS_FILL, AREA_MODE, FILL_RADIUS, RENDER_RADIUS, // 🚀 别忘了加到这里
-            SYNC_LITE_LAYER, HIDE_COMPLETED_CONTAINERS, ENABLE_DATA_SYNC, HIGHLIGHT_CONTAINERS, HIGHLIGHT_COLOR, FILL_DELAY, ENABLE_QS_EXTRACTION
+            ENABLE_MOD, CONTINUOUS_FILL, AREA_MODE, FILL_RADIUS, RENDER_RADIUS,
+            SYNC_LITE_LAYER, HIDE_COMPLETED_CONTAINERS, ENABLE_DATA_SYNC,
+            HIGHLIGHT_CONTAINERS, HIGHLIGHT_XRAY,
+            HIGHLIGHT_COLOR, FILL_DELAY, ENABLE_QS_EXTRACTION
     );
 }

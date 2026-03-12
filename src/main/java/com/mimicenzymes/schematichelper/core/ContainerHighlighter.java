@@ -52,11 +52,14 @@ public class ContainerHighlighter {
             renderBox(matrices, buffer, pos, cam, c);
         }
 
-        // 底层透视渲染（保持不变）
+        // 🚀 根据开关决定是否启用透视
         if (consumers instanceof VertexConsumerProvider.Immediate immediate) {
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            boolean xray = Configs.HIGHLIGHT_XRAY.getBooleanValue();
+            if (xray) GL11.glDisable(GL11.GL_DEPTH_TEST); // 开启透视
+
             immediate.draw(RenderLayer.getLines());
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
+
+            if (xray) GL11.glEnable(GL11.GL_DEPTH_TEST); // 恢复深度测试
         }
     }
 

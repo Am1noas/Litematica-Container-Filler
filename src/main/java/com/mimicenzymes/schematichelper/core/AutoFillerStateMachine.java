@@ -172,10 +172,9 @@ public class AutoFillerStateMachine {
         }
     }
 
-    // 🚀 核心修复：直接使用 Text.literal 解决中文显示问题
-    private void sendFeedback(MinecraftClient client, String text, boolean overlay) {
+    private void sendFeedback(MinecraftClient client, String key, boolean ignored) {
         if (client.player != null) {
-            client.player.sendMessage(Text.literal("§b[容器助手] " + text), overlay);
+            client.player.sendMessage(Text.translatable(key), true);
         }
     }
 

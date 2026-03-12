@@ -4,7 +4,7 @@ import com.mimicenzymes.schematichelper.SchematicHelperClient;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
-import fi.dy.masa.malilib.util.StringUtils; // 🚀 引入翻译工具
+import fi.dy.masa.malilib.util.StringUtils;
 import net.minecraft.client.gui.screen.Screen;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +22,8 @@ public class GuiConfigs extends GuiConfigsBase {
         this.clearOptions();
         int x = 10;
         for (ConfigGuiTab t : ConfigGuiTab.values()) {
-            // 🚀 核心修复：调用翻译器，拼接按键名
-            String tabName = StringUtils.translate("schematic_container_helper.gui.button." + t.name().toLowerCase());
-            ButtonGeneric b = new ButtonGeneric(x, 26, -1, 20, tabName);
+            String tabName = fi.dy.masa.malilib.util.StringUtils.translate("schematic_container_helper.gui.button." + t.name().toLowerCase());
+            fi.dy.masa.malilib.gui.button.ButtonGeneric b = new fi.dy.masa.malilib.gui.button.ButtonGeneric(x, 26, -1, 20, tabName);
             b.setEnabled(this.tab != t);
             this.addButton(b, (button, mouseButton) -> { this.tab = t; this.initGui(); });
             x += b.getWidth() + 2;
