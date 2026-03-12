@@ -1,0 +1,18 @@
+# Gradle 缓存
+.gradle/
+build/
+
+# IDE 配置文件
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Fabric 运行输出
+run/
+logs/
+bin/
+
+# 系统杂物
+.DS_Store

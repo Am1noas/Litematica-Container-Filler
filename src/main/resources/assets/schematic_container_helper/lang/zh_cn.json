@@ -1,0 +1,32 @@
+{
+  "schematic_container_helper.gui.title.configs": "容器助手配置",
+  "schematic_container_helper.gui.button.feature": "功能设置",
+  "schematic_container_helper.gui.button.hotkeys": "热键绑定",
+
+  "schematic_container_helper.config.enableMod": "启用模组",
+  "schematic_container_helper.config.enableMod.comment": "开启或关闭容器助手的核心填充功能",
+
+  "schematic_container_helper.config.highlightContainers": "高亮容器",
+  "schematic_container_helper.config.highlightContainers.comment": "在世界中高亮显示缺失物品的容器",
+
+  "schematic_container_helper.config.highlightColor": "高亮颜色",
+  "schematic_container_helper.config.highlightColor.comment": "容器高亮边框的颜色。使用十六进制 ARGB 格式 (如 0x808B4513)",
+
+  "schematic_container_helper.config.fillDelay": "操作延迟 (Ticks)",
+  "schematic_container_helper.config.fillDelay.comment": "每次填充动作之间的间隔嘀嗒 (Ticks)。服务器卡顿时建议调高（默认0，推荐1-2）",
+
+  "schematic_container_helper.config.enableQsExtraction": "潜影盒提取",
+  "schematic_container_helper.config.enableQsExtraction.comment": "允许模组自动打开背包内的潜影盒以提取所需材料",
+
+  "schematic_container_helper.config.fillHotkey": "填充快捷键",
+  "schematic_container_helper.config.fillHotkey.comment": "对着容器按此键开始自动同步投影清单并装填物品",
+
+  "schematic_container_helper.message.disabled_hint": "§c[容器助手] 模组已禁用！",
+  "schematic_container_helper.message.timeout": "§c[容器助手] 填充超时或卡死，已自动重置。",
+  "schematic_container_helper.message.inventory_full": "§e[容器助手] 背包已满！正在清理杂物腾出空间...",
+  "schematic_container_helper.message.no_space_error": "§c[容器助手] 背包及潜影盒全满，无法继续操作！",
+  "schematic_container_helper.message.mouse_stuck": "§c[容器助手] 鼠标上的物品无法放下，操作已中止！",
+  "schematic_container_helper.message.returning": "§a[容器助手] 填充完毕，正在将剩余材料归还至潜影盒...",
+  "schematic_container_helper.message.no_data": "§e[容器助手] 该坐标无投影数据，或容器为空。",
+  "schematic_container_helper.message.start_fill": "§a[容器助手] 开始同步容器状态..."
+}

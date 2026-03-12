@@ -1,0 +1,32 @@
+{
+  "schematic_container_helper.gui.title.configs": "Container Helper Configs",
+  "schematic_container_helper.gui.button.feature": "Features",
+  "schematic_container_helper.gui.button.hotkeys": "Hotkeys",
+
+  "schematic_container_helper.config.enableMod": "Enable Mod",
+  "schematic_container_helper.config.enableMod.comment": "Enable or disable the core features of Container Helper",
+
+  "schematic_container_helper.config.highlightContainers": "Highlight Containers",
+  "schematic_container_helper.config.highlightContainers.comment": "Highlight containers in the world that are missing items from the schematic",
+
+  "schematic_container_helper.config.highlightColor": "Highlight Color",
+  "schematic_container_helper.config.highlightColor.comment": "The color of the container highlight box. Use Hex ARGB format (e.g., 0x808B4513)",
+
+  "schematic_container_helper.config.fillDelay": "Fill Delay (Ticks)",
+  "schematic_container_helper.config.fillDelay.comment": "The interval between each filling action in Ticks. Increase this if the server is lagging",
+
+  "schematic_container_helper.config.enableQsExtraction": "Shulker Extraction",
+  "schematic_container_helper.config.enableQsExtraction.comment": "Allow the mod to automatically extract items from shulker boxes in your inventory",
+
+  "schematic_container_helper.config.fillHotkey": "Fill Hotkey",
+  "schematic_container_helper.config.fillHotkey.comment": "Press this key while looking at a container to start auto-filling",
+
+  "schematic_container_helper.message.disabled_hint": "§c[ContainerHelper] Mod is disabled!",
+  "schematic_container_helper.message.timeout": "§c[ContainerHelper] Process timed out or stuck, resetting...",
+  "schematic_container_helper.message.inventory_full": "§e[ContainerHelper] Inventory full! Freeing up space...",
+  "schematic_container_helper.message.no_space_error": "§c[ContainerHelper] No space left in inventory or shulkers!",
+  "schematic_container_helper.message.mouse_stuck": "§c[ContainerHelper] Cursor stack stuck, operation stopped!",
+  "schematic_container_helper.message.returning": "§a[ContainerHelper] Match complete. Returning items to shulker...",
+  "schematic_container_helper.message.no_data": "§e[ContainerHelper] No schematic data found at this position.",
+  "schematic_container_helper.message.start_fill": "§a[ContainerHelper] Starting container synchronization..."
+}

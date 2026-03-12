@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "schematic_container_helper",
+  "version": "1.0",
+  "name": "投影容器助手",
+  "description": "适配 Litematica，自动将背包内的物品填充至投影中的容器里。",
+  "authors": ["MimicEnzymes"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/schematic_container_helper/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.mimicenzymes.schematichelper.SchematicHelperClient"
+    ],
+    "modmenu": [
+      "com.mimicenzymes.schematichelper.config.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "schematic_container_helper.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~1.21.10",
+    "java": ">=21",
+    "malilib": "*",
+    "litematica": "*"
+  },
+  "suggests": {
+    "quickshulker": "*",
+    "modmenu": "*"
+  }
+}

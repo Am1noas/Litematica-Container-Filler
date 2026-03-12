@@ -1,0 +1,33 @@
+plugins {
+    id 'fabric-loom' version '1.15-SNAPSHOT'
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+// --- 仓库配置区（注意这里的括号必须闭合！） ---
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+    maven { url "https://bmclapi2.bangbang93.com/maven" }
+    maven { url "https://maven.aliyun.com/repository/public" }
+    maven { url "https://maven.fabricmc.net/" }
+    maven { url "https://masa.dy.fi/maven/" }
+    mavenCentral()
+}
+
+// --- 依赖配置区 ---
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation name: 'litematica-fabric-1.21.10-0.24.7'
+    modImplementation name: 'malilib-fabric-1.21.10-0.26.8'
+    modCompileOnly name: 'modmenu-16.0.0'
+    modLocalRuntime name: 'modmenu-16.0.0'
+    modCompileOnly name: 'quickshulker-2.8.0-1.21.9'
+    modLocalRuntime name: 'quickshulker-2.8.0-1.21.9'
+}
