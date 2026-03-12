@@ -6,7 +6,7 @@
   "enableMod": "启用模组",
   "config.name.enableMod": "启用模组",
   "schematic_container_helper.config.name.enableMod": "启用模组",
-  "schematic_container_helper.config.comment.enableMod": "开启或关闭容器助手的核心填充功能",
+  "schematic_container_helper.config.comment.enableMod": "开启或关闭容器助手的核心功能",
 
   "continuousFill": "持续填充",
   "config.name.continuousFill": "持续填充",
@@ -23,10 +23,25 @@
   "schematic_container_helper.config.name.fillRadius": "范围扫描半径",
   "schematic_container_helper.config.comment.fillRadius": "范围填充模式下的扫描半径 (1 - 32格)",
 
+  "renderRadius": "高亮渲染半径",
+  "config.name.renderRadius": "高亮渲染半径",
+  "schematic_container_helper.config.name.renderRadius": "高亮渲染半径",
+  "schematic_container_helper.config.comment.renderRadius": "缺货容器的高亮透视线框渲染半径 (1 - 64格)",
+
   "syncLiteLayer": "跟随投影渲染层",
   "config.name.syncLiteLayer": "跟随投影渲染层",
   "schematic_container_helper.config.name.syncLiteLayer": "跟随投影渲染层",
   "schematic_container_helper.config.comment.syncLiteLayer": "开启后，只会填充当前 Litematica 渲染层内的容器，忽略被隐藏的层",
+
+  "hideCompletedContainers": "自动隐藏已满容器",
+  "config.name.hideCompletedContainers": "自动隐藏已满容器",
+  "schematic_container_helper.config.name.hideCompletedContainers": "自动隐藏已满容器",
+  "schematic_container_helper.config.comment.hideCompletedContainers": "开启后，当容器被填满时，自动隐藏其高亮透视框",
+
+  "enableDataSync": "启用数据同步",
+  "config.name.enableDataSync": "启用数据同步",
+  "schematic_container_helper.config.name.enableDataSync": "启用数据同步",
+  "schematic_container_helper.config.comment.enableDataSync": "利用 Servux/Tweakmore 等模组同步的数据在后台实时验证库存，消除高亮误判",
 
   "highlightContainers": "高亮容器",
   "config.name.highlightContainers": "高亮容器",
@@ -48,10 +63,10 @@
   "schematic_container_helper.config.name.enableQsExtraction": "潜影盒提取",
   "schematic_container_helper.config.comment.enableQsExtraction": "允许模组自动打开背包内的潜影盒以提取所需材料",
 
-  "fillHotkey": "手动填充快捷键",
-  "config.name.fillHotkey": "手动填充快捷键",
-  "schematic_container_helper.config.name.fillHotkey": "手动填充快捷键",
-  "schematic_container_helper.config.comment.fillHotkey": "按此键立即执行一次装填 (根据当前是准星还是范围模式决定)",
+  "fillContainer": "手动填充快捷键",
+  "config.name.fillContainer": "手动填充快捷键",
+  "schematic_container_helper.config.name.fillContainer": "手动填充快捷键",
+  "schematic_container_helper.config.comment.fillContainer": "按此键立即执行一次装填 (根据当前是准星还是范围模式决定)",
 
   "toggleContinuous": "切换持续填充开关",
   "config.name.toggleContinuous": "切换持续填充开关",
@@ -73,7 +88,14 @@
   "schematic_container_helper.message.inventory_full": "§e[容器助手] 背包已满！正在清理杂物腾出空间...",
   "schematic_container_helper.message.no_space_error": "§c[容器助手] 背包及潜影盒全满，无法继续操作！",
   "schematic_container_helper.message.mouse_stuck": "§c[容器助手] 鼠标上的物品无法放下，操作已中止！",
+  "schematic_container_helper.message.fill_success": "§a[容器助手] 容器填充成功！",
   "schematic_container_helper.message.returning": "§a[容器助手] 填充完毕，正在将剩余材料归还至潜影盒...",
   "schematic_container_helper.message.no_data": "§e[容器助手] 该坐标无投影数据，或容器为空。",
-  "schematic_container_helper.message.start_fill": "§a[容器助手] 开始同步容器状态..."
+  "schematic_container_helper.message.start_fill": "§a[容器助手] 开始同步容器状态...",
+  "schematic_container_helper.message.exchange_fail": "§c[容器助手] 潜影盒内空间置换失败！",
+  "schematic_container_helper.message.scan_start": "§a[容器助手] 找到 %s 个缺货容器，开始自动填充！",
+  "schematic_container_helper.message.continuous_on": "§a[容器助手] 已开启持续自动填充",
+  "schematic_container_helper.message.continuous_off": "§c[容器助手] 已关闭持续自动填充",
+  "schematic_container_helper.message.mode_area": "§e[容器助手] 当前模式：范围扫描填充",
+  "schematic_container_helper.message.mode_single": "§e[容器助手] 当前模式：准星单体填充"
 }

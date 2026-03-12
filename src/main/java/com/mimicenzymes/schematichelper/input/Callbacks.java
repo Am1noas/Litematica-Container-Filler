@@ -5,6 +5,7 @@ import com.mimicenzymes.schematichelper.config.GuiConfigs;
 import com.mimicenzymes.schematichelper.config.Hotkeys;
 import com.mimicenzymes.schematichelper.core.AreaScanner;
 import com.mimicenzymes.schematichelper.core.AutoFillerStateMachine;
+import com.mimicenzymes.schematichelper.core.CompletedContainers;
 import com.mimicenzymes.schematichelper.core.SchematicContainerReader;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
@@ -12,9 +13,9 @@ import fi.dy.masa.malilib.hotkeys.IKeybind;
 import fi.dy.masa.malilib.hotkeys.KeyAction;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.text.Text;
 import java.util.Map;
 
 public class Callbacks implements IHotkeyCallback {
@@ -26,7 +27,7 @@ public class Callbacks implements IHotkeyCallback {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || action != KeyAction.PRESS) return false;
 
-        // 这里的比较逻辑现在非常稳固
+        // 🚀 1.21 适配：直接比对实例，不比对字符串，告别找不到符号
         if (key == Hotkeys.OPEN_CONFIG_GUI.getKeybind()) {
             GuiBase.openGui(new GuiConfigs(null));
             return true;
@@ -40,12 +41,12 @@ public class Callbacks implements IHotkeyCallback {
         } else if (key == Hotkeys.TOGGLE_CONTINUOUS.getKeybind()) {
             boolean state = !Configs.CONTINUOUS_FILL.getBooleanValue();
             Configs.CONTINUOUS_FILL.setBooleanValue(state);
-            mc.player.sendMessage(Text.literal(state ? "§a开启持续填充" : "§c关闭持续填充"), true);
+            mc.player.sendMessage(Text.translatable(state ? "schematic_container_helper.message.continuous_on" : "schematic_container_helper.message.continuous_off"), true);
             return true;
         } else if (key == Hotkeys.TOGGLE_MODE.getKeybind()) {
             boolean state = !Configs.AREA_MODE.getBooleanValue();
             Configs.AREA_MODE.setBooleanValue(state);
-            mc.player.sendMessage(Text.literal(state ? "§b范围模式" : "§e单体模式"), true);
+            mc.player.sendMessage(Text.translatable(state ? "schematic_container_helper.message.mode_area" : "schematic_container_helper.message.mode_single"), true);
             return true;
         }
         return false;
@@ -53,12 +54,14 @@ public class Callbacks implements IHotkeyCallback {
 
     private void executeFill(MinecraftClient mc) {
         if (Configs.AREA_MODE.getBooleanValue()) {
-            AreaScanner.executeScan(mc); // <-- 就是这里
-        } else if (mc.crosshairTarget instanceof net.minecraft.util.hit.BlockHitResult bhr) {
+            AreaScanner.executeScan(mc);
+        } else if (mc.crosshairTarget instanceof BlockHitResult bhr) {
             BlockPos pos = bhr.getBlockPos();
+            CompletedContainers.remove(pos); // 强制破防
             Map<Integer, ItemStack> items = SchematicContainerReader.getRequiredItems(pos, mc.world);
-            if (!items.isEmpty()) AutoFillerStateMachine.getInstance().addTask(pos, items);
+            if (items != null && !items.isEmpty()) {
+                AutoFillerStateMachine.getInstance().addTask(pos, items);
+            }
         }
     }
-
 }

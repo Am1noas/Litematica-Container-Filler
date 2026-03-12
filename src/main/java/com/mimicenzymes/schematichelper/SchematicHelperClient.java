@@ -3,6 +3,7 @@ package com.mimicenzymes.schematichelper;
 import com.mimicenzymes.schematichelper.config.ConfigHandler;
 import com.mimicenzymes.schematichelper.config.Hotkeys;
 import com.mimicenzymes.schematichelper.core.AutoFillerStateMachine;
+import com.mimicenzymes.schematichelper.core.AutoSyncManager;
 import com.mimicenzymes.schematichelper.core.ContainerHighlighter;
 import com.mimicenzymes.schematichelper.core.SchematicChangeListener;
 import com.mimicenzymes.schematichelper.input.Callbacks;
@@ -15,7 +16,8 @@ import fi.dy.masa.malilib.interfaces.IInitializationHandler;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+// 🚀 修正：Events 在 v1 下，Context 才在 v1.world 下
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 
 public class SchematicHelperClient implements ClientModInitializer {
     public static final String MOD_ID = "schematic_container_helper";
@@ -23,11 +25,16 @@ public class SchematicHelperClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            AutoFillerStateMachine.getInstance().tick(client);
-            SchematicChangeListener.tick(client);
+            if (client.world != null) {
+                AutoFillerStateMachine.getInstance().tick(client);
+                SchematicChangeListener.tick(client);
+                // 🚀 补回这一行，不然掏空箱子后红框不亮！
+                AutoSyncManager.tick(client);
+            }
         });
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+            // 🚀 调用高亮渲染
             ContainerHighlighter.onRender(context);
         });
 
@@ -43,7 +50,6 @@ public class SchematicHelperClient implements ClientModInitializer {
 
             InputEventHandler.getKeybindManager().registerKeybindProvider(InputHandler.getInstance());
 
-            // 🚀 重点：用你说的“打开配置菜单的方式”，全局只绑一次！MaLiLib 会自动处理改键！
             Hotkeys.OPEN_CONFIG_GUI.getKeybind().setCallback(Callbacks.getInstance());
             Hotkeys.FILL_CONTAINER.getKeybind().setCallback(Callbacks.getInstance());
             Hotkeys.TOGGLE_CONTINUOUS.getKeybind().setCallback(Callbacks.getInstance());

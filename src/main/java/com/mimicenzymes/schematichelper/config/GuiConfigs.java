@@ -2,7 +2,9 @@ package com.mimicenzymes.schematichelper.config;
 
 import com.mimicenzymes.schematichelper.SchematicHelperClient;
 import fi.dy.masa.malilib.gui.GuiConfigsBase;
+import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.hotkeys.IHotkey;
+import fi.dy.masa.malilib.util.StringUtils; // 🚀 引入翻译工具
 import net.minecraft.client.gui.screen.Screen;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,9 @@ public class GuiConfigs extends GuiConfigsBase {
         this.clearOptions();
         int x = 10;
         for (ConfigGuiTab t : ConfigGuiTab.values()) {
-            fi.dy.masa.malilib.gui.button.ButtonGeneric b = new fi.dy.masa.malilib.gui.button.ButtonGeneric(x, 26, -1, 20, t.name());
+            // 🚀 核心修复：调用翻译器，拼接按键名
+            String tabName = StringUtils.translate("schematic_container_helper.gui.button." + t.name().toLowerCase());
+            ButtonGeneric b = new ButtonGeneric(x, 26, -1, 20, tabName);
             b.setEnabled(this.tab != t);
             this.addButton(b, (button, mouseButton) -> { this.tab = t; this.initGui(); });
             x += b.getWidth() + 2;
@@ -33,7 +37,6 @@ public class GuiConfigs extends GuiConfigsBase {
         if (this.tab == ConfigGuiTab.FEATURE) {
             Configs.OPTIONS.forEach(c -> list.add(new ConfigOptionWrapper(c)));
         } else {
-            // 🚀 这里强转 IHotkey 会触发 MaLiLib 1.21 的实时刷新机制
             Hotkeys.HOTKEY_LIST.forEach(h -> list.add(new ConfigOptionWrapper((IHotkey) h)));
         }
         return list;

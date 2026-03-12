@@ -1,11 +1,10 @@
 package com.mimicenzymes.schematichelper.core;
 
 import com.mimicenzymes.schematichelper.config.Configs;
-import fi.dy.masa.litematica.data.DataManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-
+import net.minecraft.text.Text;
 import java.util.List;
 import java.util.Map;
 
@@ -19,25 +18,28 @@ public class AreaScanner {
         int radius = Configs.FILL_RADIUS.getIntegerValue();
 
         List<BlockPos> targets = SpatialContainerIndex.queryRadius(px, py, pz, radius);
+        int count = 0; // 记录找到的缺货容器数量
 
         for (BlockPos pos : targets) {
-            // 🚀 1. 检查 Litematica 渲染层级
-            if (Configs.SYNC_LITE_LAYER.getBooleanValue() && !DataManager.getRenderLayerRange().isPositionWithinRange(pos)) {
-                continue;
-            }
+            if (Configs.SYNC_LITE_LAYER.getBooleanValue() && !fi.dy.masa.litematica.data.DataManager.getRenderLayerRange().isPositionWithinRange(pos)) continue;
+            if (CompletedContainers.isCompleted(pos)) continue;
 
-            // 🚀 2. 检查是否已经填满过了
-            if (CompletedContainers.isCompleted(pos)) {
-                continue;
-            }
+            Map<Integer, ItemStack> required = SchematicContainerReader.getRequiredItems(pos, mc.world);
 
-            Map<Integer, ItemStack> items = SchematicContainerReader.getRequiredItems(pos, mc.world);
-            if (items != null && !items.isEmpty()) {
-                AutoFillerStateMachine.getInstance().addTask(pos, items);
-            } else {
-                // 如果发现不需要物品（本来就是满的），直接标记为完成，下次不再扫描
+            if (RealContainerReader.isSatisfied(mc, pos, required)) {
                 CompletedContainers.add(pos);
+                continue;
             }
+
+            if (required != null && !required.isEmpty()) {
+                AutoFillerStateMachine.getInstance().addTask(pos, required);
+                count++;
+            }
+        }
+
+        // 🚀 扫描反馈
+        if (count > 0) {
+            mc.player.sendMessage(Text.translatable("schematic_container_helper.message.scan_start", count), false);
         }
     }
 }

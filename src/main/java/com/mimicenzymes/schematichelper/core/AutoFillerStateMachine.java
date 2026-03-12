@@ -1,6 +1,5 @@
 package com.mimicenzymes.schematichelper.core;
 
-import com.mimicenzymes.schematichelper.config.ConfigHandler;
 import com.mimicenzymes.schematichelper.config.Configs;
 import com.mimicenzymes.schematichelper.dependency.DependencyChecker;
 import com.mimicenzymes.schematichelper.dependency.DummyExtractor;
@@ -68,8 +67,7 @@ public class AutoFillerStateMachine {
         if (currentTask != null) {
             watchdogTimer++;
             if (watchdogTimer > 100) {
-                //超时重置
-                sendFeedback(client, "message.timeout", true);
+                sendFeedback(client, "§c操作超时，自动重置状态", true);
                 reset();
                 return;
             }
@@ -102,8 +100,7 @@ public class AutoFillerStateMachine {
 
         if (!handler.getCursorStack().isEmpty()) {
             if (!tryPlaceCursorItem(client, handler)) {
-                //鼠标卡住
-                sendFeedback(client, "message.mouse_stuck", true);
+                sendFeedback(client, "§c鼠标卡住，请手动清理物品栏", true);
                 reset(); return;
             }
             if (delay > 0) { actionWaitTicks = delay; return; }
@@ -129,13 +126,12 @@ public class AutoFillerStateMachine {
                     if (shulkerSlot != -1) {
                         int trashSlot = findTrashSlotSafe(client, required.isEmpty() ? current : required, shulkerSlot);
                         if (trashSlot != -1) {
-                            // 🚀 国际化：腾挪空间
-                            sendFeedback(client, "message.inventory_full", true);
+                            sendFeedback(client, "§e背包已满，正在腾挪空间...", true);
                             queueFreeUpInventorySpace(client, shulkerSlot, trashSlot);
                             return;
                         }
                     }
-                    sendFeedback(client, "message.no_space_error", true);
+                    sendFeedback(client, "§c背包空间不足，无法清理容器", true);
                     reset(); return;
                 }
                 client.interactionManager.clickSlot(syncId, uiSlot, 0, SlotActionType.QUICK_MOVE, client.player);
@@ -162,22 +158,24 @@ public class AutoFillerStateMachine {
         }
 
         if (allMatched) {
-            //填充完毕
+            // 🚀 核心修复：成功填充后立即标记，消除高亮红框
             CompletedContainers.add(currentTask.targetPos);
 
             if (lastOpenedShulkerSlot != -1 && !borrowedItems.isEmpty()) {
-                sendFeedback(client, "message.returning", true);
+                sendFeedback(client, "§a填充完毕，正在归还借用物品...", true);
                 queueReturnBorrowedItems(client, lastOpenedShulkerSlot);
             } else {
+                sendFeedback(client, "§a填充完成！", true);
                 client.player.closeHandledScreen();
                 reset();
             }
         }
     }
 
-    private void sendFeedback(MinecraftClient client, String keySuffix, boolean overlay) {
+    // 🚀 核心修复：直接使用 Text.literal 解决中文显示问题
+    private void sendFeedback(MinecraftClient client, String text, boolean overlay) {
         if (client.player != null) {
-            client.player.sendMessage(Text.translatable("schematic_container_helper." + keySuffix), overlay);
+            client.player.sendMessage(Text.literal("§b[容器助手] " + text), overlay);
         }
     }
 
@@ -238,7 +236,7 @@ public class AutoFillerStateMachine {
                     client.interactionManager.clickSlot(h.syncId, uiTrashSlot, 0, SlotActionType.PICKUP, client.player);
                     client.interactionManager.clickSlot(h.syncId, itemInShulker, 0, SlotActionType.PICKUP, client.player);
                 } else {
-                    sendFeedback(client, "message.exchange_fail", true);
+                    sendFeedback(client, "§c潜影盒内空间置换失败", true);
                 }
             }
         });
