@@ -24,15 +24,27 @@ public class Callbacks implements IHotkeyCallback {
     @Override
     public boolean onKeyAction(KeyAction action, IKeybind key) {
         MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.player == null || action != KeyAction.PRESS) return false;
+        if (action != KeyAction.PRESS) return false;
 
+        // 1. 打开菜单
         if (key == Hotkeys.OPEN_CONFIG_GUI.getKeybind()) {
             GuiBase.openGui(new GuiConfigs(null));
             return true;
         }
 
-        if (!Configs.ENABLE_MOD.getBooleanValue()) return false;
+        if (mc.player == null) return false;
 
+        // 2. 模组总开关拦截（如果有按键按了，但模组关了，弹出红字警告）
+        if (!Configs.ENABLE_MOD.getBooleanValue()) {
+            if (key == Hotkeys.FILL_CONTAINER.getKeybind() ||
+                    key == Hotkeys.TOGGLE_CONTINUOUS.getKeybind() ||
+                    key == Hotkeys.TOGGLE_MODE.getKeybind()) {
+                mc.player.sendMessage(Text.literal("§c[容器助手] 模组当前已停用，快捷键无效！"), true);
+            }
+            return false;
+        }
+
+        // 3. 业务逻辑，极速内存 == 比对
         if (key == Hotkeys.FILL_CONTAINER.getKeybind()) {
             executeFill(mc);
             return true;
@@ -47,6 +59,7 @@ public class Callbacks implements IHotkeyCallback {
             mc.player.sendMessage(Text.translatable(state ? "schematic_container_helper.message.mode_area" : "schematic_container_helper.message.mode_single"), true);
             return true;
         }
+
         return false;
     }
 
@@ -58,6 +71,8 @@ public class Callbacks implements IHotkeyCallback {
             Map<Integer, ItemStack> items = SchematicContainerReader.getRequiredItems(pos, mc.world.getRegistryManager());
             if (items != null && !items.isEmpty()) {
                 AutoFillerStateMachine.getInstance().addTask(pos, items);
+            } else {
+                mc.player.sendMessage(Text.literal("§e[容器助手] 准星处没有缺货的投影容器"), true);
             }
         }
     }

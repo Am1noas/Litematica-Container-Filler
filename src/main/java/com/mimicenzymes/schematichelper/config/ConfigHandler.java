@@ -1,7 +1,9 @@
 package com.mimicenzymes.schematichelper.config;
 
+import com.mimicenzymes.schematichelper.input.InputHandler;
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.IConfigHandler;
+import fi.dy.masa.malilib.event.InputEventHandler;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import com.google.gson.JsonElement;
@@ -33,5 +35,7 @@ public class ConfigHandler implements IConfigHandler {
             ConfigUtils.writeConfigBase(root, "Hotkeys", Hotkeys.HOTKEY_LIST);
             JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME));
         }
+
+        InputHandler.getInstance().addKeysToMap(InputEventHandler.getKeybindManager());
     }
 }

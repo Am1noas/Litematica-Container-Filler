@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "schematic_container_helper",
-  "version": "0.2",
+  "version": "0.3",
   "name": "投影容器助手",
   "description": "适配 Litematica，自动将背包内的物品填充至投影中的容器里。",
   "authors": ["MimicEnzymes"],
