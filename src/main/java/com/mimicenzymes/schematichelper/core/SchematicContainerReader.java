@@ -56,4 +56,42 @@ public class SchematicContainerReader {
         }
         return items;
     }
+    public static Map<Integer, ItemStack> getRequiredItemsFromNbt(net.minecraft.nbt.NbtCompound nbt, net.minecraft.registry.DynamicRegistryManager registryManager) {
+        if (!nbt.contains("Items")) return null;
+
+        net.minecraft.nbt.NbtElement rawList = nbt.get("Items");
+        if (!(rawList instanceof net.minecraft.nbt.NbtList itemsList)) return null;
+
+        Map<Integer, ItemStack> items = new HashMap<>();
+
+        for (int i = 0; i < itemsList.size(); i++) {
+            net.minecraft.nbt.NbtElement element = itemsList.get(i);
+            if (!(element instanceof net.minecraft.nbt.NbtCompound itemNbt)) continue;
+
+            int slot = 0;
+            if (itemNbt.contains("Slot")) {
+                net.minecraft.nbt.NbtElement slotEl = itemNbt.get("Slot");
+                if (slotEl instanceof net.minecraft.nbt.AbstractNbtNumber num) {
+                    slot = num.byteValue() & 0xFF;
+                }
+            }
+
+            final int finalSlot = slot;
+
+            try {
+                com.mojang.serialization.DataResult<net.minecraft.item.ItemStack> result =
+                        net.minecraft.item.ItemStack.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, itemNbt);
+
+                result.result().ifPresent(stack -> {
+                    if (!stack.isEmpty()) {
+                        // 🚀 这里使用刚才定义的 finalSlot，红线消失！
+                        items.put(finalSlot, stack);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return items;
+    }
 }

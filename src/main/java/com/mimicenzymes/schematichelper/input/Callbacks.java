@@ -33,13 +33,17 @@ public class Callbacks implements IHotkeyCallback {
             return true;
         }
 
+        if (!Configs.ENABLE_MOD.getBooleanValue()) {
+            return false;
+        }
+
         if (mc.player == null) return false;
 
         if (!Configs.ENABLE_MOD.getBooleanValue()) {
             if (key == Hotkeys.FILL_CONTAINER.getKeybind() ||
                     key == Hotkeys.TOGGLE_CONTINUOUS.getKeybind() ||
                     key == Hotkeys.TOGGLE_MODE.getKeybind()) {
-                mc.player.sendMessage(Text.literal("§c[投影容器填充机] 模组当前已停用，快捷键无效！"), true); // 改为 true，显示在动作栏
+                mc.player.sendMessage(Text.translatable("schematic_container_helper.message.mod_disabled"), true);
             }
             return false;
         }
@@ -75,15 +79,15 @@ public class Callbacks implements IHotkeyCallback {
                 if (items != null && !items.isEmpty()) {
                     if (!RealContainerCache.isSatisfied(pos, items)) {
                         AutoFillerStateMachine.getInstance().addTask(pos, items);
-                        mc.player.sendMessage(Text.literal("§a[投影容器填充机] 正在添加单体填充任务..."), true);
+                        mc.player.sendMessage(Text.translatable("schematic_container_helper.message.task_dispatched"), true);
                     } else {
-                        mc.player.sendMessage(Text.literal("§e[投影容器填充机] 该容器已经满足投影要求，无需填充。"), true);
+                        mc.player.sendMessage(Text.translatable("schematic_container_helper.message.already_satisfied"), true);
                     }
                 } else {
-                    mc.player.sendMessage(Text.literal("§e[投影容器填充机] 准星指向的容器没有投影要求。"), true);
+                    mc.player.sendMessage(Text.translatable("schematic_container_helper.message.no_requirements"), true);
                 }
             } else {
-                mc.player.sendMessage(Text.literal("§c[投影容器填充机] 请将准星准确对准一个容器方块！"), true);
+                mc.player.sendMessage(Text.translatable("schematic_container_helper.message.target_invalid"), true);
             }
         }
     }

@@ -9,7 +9,6 @@ public class Hotkeys {
     public static final ConfigHotkey FILL_CONTAINER = new ConfigHotkey("schematic_container_helper.hotkey.name.fillContainer", "V", "schematic_container_helper.hotkey.comment.fillContainer");
     public static final ConfigHotkey TOGGLE_CONTINUOUS = new ConfigHotkey("schematic_container_helper.hotkey.name.toggleContinuous", "", "schematic_container_helper.hotkey.comment.toggleContinuous");
     public static final ConfigHotkey TOGGLE_MODE = new ConfigHotkey("schematic_container_helper.hotkey.name.toggleMode", "", "schematic_container_helper.hotkey.comment.toggleMode");
-
     public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
             OPEN_CONFIG_GUI, FILL_CONTAINER, TOGGLE_CONTINUOUS, TOGGLE_MODE
     );

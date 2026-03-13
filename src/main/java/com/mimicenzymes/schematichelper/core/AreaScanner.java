@@ -21,7 +21,7 @@ public class AreaScanner {
 
         var schematicWorld = SchematicWorldHandler.getSchematicWorld();
         if (schematicWorld == null) {
-            if (!isSilentPrinter) mc.player.sendMessage(Text.literal("§c[投影容器填充机] 未加载投影世界！"), true); // 改为 true
+            if (!isSilentPrinter) mc.player.sendMessage(Text.translatable("schematic_container_helper.message.no_schematic_world"), true);
             return;
         }
 
@@ -65,9 +65,9 @@ public class AreaScanner {
 
         if (!isSilentPrinter) {
             if (count > 0) {
-                mc.player.sendMessage(Text.literal("§a[投影容器扫描] 发现 " + count + " 个缺货容器，开始添加任务..."), true); // 改为 true
+                mc.player.sendMessage(Text.translatable("schematic_container_helper.message.scan_start", count), true);
             } else {
-                mc.player.sendMessage(Text.literal("§e[投影容器填充机] 扫描完毕，周围没有需要填充的缺货容器！"), true); // 改为 true
+                mc.player.sendMessage(Text.translatable("schematic_container_helper.message.no_requirements"), true);
             }
         }
     }

@@ -100,7 +100,7 @@ public class AutoFillerStateMachine {
                         break;
                     }
                 }
-                sendFeedback(client, "§c[材料告急] 缺少: " + sb.toString(), true);
+                sendFeedback(client, Text.translatable("schematic_container_helper.message.material_shortage", sb.toString()).getString(), true);
                 return;
             }
         }
@@ -140,7 +140,7 @@ public class AutoFillerStateMachine {
         if (currentTask != null) {
             watchdogTimer++;
             if (watchdogTimer > 100) {
-                sendFeedback(client, "§c操作超时，自动重置状态", true);
+                sendFeedback(client, Text.translatable("schematic_container_helper.message.timeout_reset").getString(), true);
                 reset();
                 return;
             }
@@ -173,7 +173,7 @@ public class AutoFillerStateMachine {
 
         if (!handler.getCursorStack().isEmpty()) {
             if (!tryPlaceCursorItem(client, handler)) {
-                sendFeedback(client, "§c鼠标卡住，请手动清理物品栏", true);
+                sendFeedback(client, Text.translatable("schematic_container_helper.message.cursor_stuck").getString(), true);
                 reset(); return;
             }
             if (delay > 0) { actionWaitTicks = delay; return; }
@@ -238,7 +238,7 @@ public class AutoFillerStateMachine {
                             break;
                         }
                     }
-                    sendFeedback(client, "§c[部分告急] 缺少: " + sb.toString(), true);
+                    sendFeedback(client, Text.translatable("schematic_container_helper.message.fill_success").getString(), true);
 
                     if (current.isEmpty()) currentTask.requiredItems.remove(containerSlot);
                     else currentTask.requiredItems.put(containerSlot, current.copy());

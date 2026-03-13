@@ -46,6 +46,10 @@ public class SchematicHelperClient implements ClientModInitializer {
                 }
             }
 
+            if (!com.mimicenzymes.schematichelper.config.Configs.ENABLE_MOD.getBooleanValue()) {
+                return;
+            }
+
             if (client.world != null) {
                 AutoFillerStateMachine.getInstance().tick(client);
                 SchematicChangeListener.tick(client);
@@ -79,9 +83,10 @@ public class SchematicHelperClient implements ClientModInitializer {
         });
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            ContainerHighlighter.onRender(context);
+            if (com.mimicenzymes.schematichelper.config.Configs.ENABLE_MOD.getBooleanValue()) {
+                ContainerHighlighter.onRender(context);
+            }
         });
-
         InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
     }
 
@@ -92,6 +97,7 @@ public class SchematicHelperClient implements ClientModInitializer {
             configHandler.load();
             ConfigManager.getInstance().registerConfigHandler(SchematicHelperClient.MOD_ID, configHandler);
             InputEventHandler.getKeybindManager().registerKeybindProvider(InputHandler.getInstance());
+
         }
     }
 }

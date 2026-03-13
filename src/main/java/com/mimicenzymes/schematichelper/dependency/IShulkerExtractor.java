@@ -1,7 +1,7 @@
 package com.mimicenzymes.schematichelper.dependency;
 
 /**
- * 潜影盒提取器接口
+ * 快捷潜影盒接口
  * 负责向服务端发送打开背包中潜影盒的请求
  */
 public interface IShulkerExtractor {
