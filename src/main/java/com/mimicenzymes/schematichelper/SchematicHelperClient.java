@@ -43,12 +43,8 @@ public class SchematicHelperClient implements ClientModInitializer {
         public void registerModHandlers() {
             ConfigHandler configHandler = new ConfigHandler();
             configHandler.load();
-            ConfigManager.getInstance().registerConfigHandler(MOD_ID, configHandler);
+            ConfigManager.getInstance().registerConfigHandler(SchematicHelperClient.MOD_ID, configHandler);
             InputEventHandler.getKeybindManager().registerKeybindProvider(InputHandler.getInstance());
-            Hotkeys.OPEN_CONFIG_GUI.getKeybind().setCallback(Callbacks.getInstance());
-            Hotkeys.FILL_CONTAINER.getKeybind().setCallback(Callbacks.getInstance());
-            Hotkeys.TOGGLE_CONTINUOUS.getKeybind().setCallback(Callbacks.getInstance());
-            Hotkeys.TOGGLE_MODE.getKeybind().setCallback(Callbacks.getInstance());
         }
     }
 }

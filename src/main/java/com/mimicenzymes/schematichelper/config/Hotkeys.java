@@ -5,12 +5,12 @@ import fi.dy.masa.malilib.config.options.ConfigHotkey;
 import java.util.List;
 
 public class Hotkeys {
-    public static final ConfigHotkey FILL_CONTAINER = new ConfigHotkey("fillContainer", "V", "Fill container");
-    public static final ConfigHotkey TOGGLE_CONTINUOUS = new ConfigHotkey("toggleContinuous", "", "Toggle continuous");
-    public static final ConfigHotkey TOGGLE_MODE = new ConfigHotkey("toggleMode", "", "Toggle mode");
-    public static final ConfigHotkey OPEN_CONFIG_GUI = new ConfigHotkey("openConfigGui", "L,C", "Open config");
+    public static final ConfigHotkey OPEN_CONFIG_GUI = new ConfigHotkey("schematic_container_helper.hotkey.name.openConfigGui", "L,C", "schematic_container_helper.hotkey.comment.openConfigGui");
+    public static final ConfigHotkey FILL_CONTAINER = new ConfigHotkey("schematic_container_helper.hotkey.name.fillContainer", "V", "schematic_container_helper.hotkey.comment.fillContainer");
+    public static final ConfigHotkey TOGGLE_CONTINUOUS = new ConfigHotkey("schematic_container_helper.hotkey.name.toggleContinuous", "", "schematic_container_helper.hotkey.comment.toggleContinuous");
+    public static final ConfigHotkey TOGGLE_MODE = new ConfigHotkey("schematic_container_helper.hotkey.name.toggleMode", "", "schematic_container_helper.hotkey.comment.toggleMode");
 
     public static final List<ConfigHotkey> HOTKEY_LIST = ImmutableList.of(
-            FILL_CONTAINER, TOGGLE_CONTINUOUS, TOGGLE_MODE, OPEN_CONFIG_GUI
+            OPEN_CONFIG_GUI, FILL_CONTAINER, TOGGLE_CONTINUOUS, TOGGLE_MODE
     );
 }
