@@ -32,17 +32,17 @@ public class RealContainerCache {
     public static void tick(MinecraftClient client) {
         if (client.world == null || client.player == null) return;
 
-        // 记录鼠标看的位置兜底
+        //记录鼠标看的位置兜底
         if (client.currentScreen == null && client.crosshairTarget instanceof BlockHitResult bhr) {
             lastLookedPos = bhr.getBlockPos();
         }
 
-        // 自然打开 GUI 时的监听
+        //自然打开GUI时的监听
         if (client.currentScreen instanceof HandledScreen<?> screen) {
             updateFromScreen(client, screen);
         }
 
-        // Servux 多人数据包兜底
+        //Servux数据包兜底
         if (Configs.ENABLE_DATA_SYNC.getBooleanValue() && !client.isInSingleplayer()) {
             tickCounter++;
             if (tickCounter >= 20) {
@@ -73,7 +73,6 @@ public class RealContainerCache {
         }
     }
 
-    // 🚀 给机器人调用的“快照抢拍”方法，消除最后一件物品放进去来不及记录的 Bug
     public static void updateFromScreen(MinecraftClient client, HandledScreen<?> screen) {
         BlockPos pos = AutoFillerStateMachine.getInstance().getCurrentTaskPos();
         if (pos == null) pos = lastLookedPos;
@@ -98,7 +97,6 @@ public class RealContainerCache {
         }
     }
 
-    // 🚀 单机模式上帝视角，直接调用底层 Inventory 读取
     private static Map<Integer, ItemStack> getSingleplayerRealItems(BlockPos pos, ServerWorld serverWorld) {
         Map<Integer, ItemStack> items = new HashMap<>();
         BlockState state = serverWorld.getBlockState(pos);
@@ -139,7 +137,7 @@ public class RealContainerCache {
         return items;
     }
 
-    // 无视版本报错的暴力 NBT 解析兜底
+    //暴力NBT解析
     public static Map<Integer, ItemStack> parseNbtInventory(NbtCompound nbt, RegistryWrapper.WrapperLookup registries) {
         Map<Integer, ItemStack> items = new HashMap<>();
         NbtElement itemsElem = nbt.get("Items");
@@ -182,11 +180,11 @@ public class RealContainerCache {
         return items;
     }
 
-    // 严格槽位比对校验
+    //严格槽位比对校验
     public static boolean isSatisfied(BlockPos pos, Map<Integer, ItemStack> required) {
         if (required == null || required.isEmpty()) return true;
 
-        // 1. 先查零延迟的 GUI 抢拍缓存
+        //先查零延迟的GUI抢拍缓存
         if (checkMap(CACHE.get(pos), required)) return true;
 
         MinecraftClient client = MinecraftClient.getInstance();
@@ -209,7 +207,7 @@ public class RealContainerCache {
         if (realItems == null) return false;
         for (Map.Entry<Integer, ItemStack> req : required.entrySet()) {
             ItemStack realStack = realItems.getOrDefault(req.getKey(), ItemStack.EMPTY);
-            // 强迫症专属：格格对齐、物品对应、数量严谨
+            //强迫症福音
             if (realStack.isEmpty() || !realStack.isOf(req.getValue().getItem()) || realStack.getCount() < req.getValue().getCount()) {
                 return false;
             }

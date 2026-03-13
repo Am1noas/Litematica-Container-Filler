@@ -1,3 +1,4 @@
+//核心出装
 package com.mimicenzymes.schematichelper.core;
 
 import com.mimicenzymes.schematichelper.config.Configs;
@@ -55,7 +56,6 @@ public class AutoFillerStateMachine {
         this.shulkerExtractor = DependencyChecker.HAS_QUICK_SHULKER ? new QuickShulkerWrapper() : new DummyExtractor();
     }
 
-    // 🚀 核心修复 1：拦截积压任务，拒绝重复塞单！
     public void addTask(BlockPos pos, Map<Integer, ItemStack> requiredItems) {
         // 如果当前正在处理这个箱子，无视新订单
         if (currentTask != null && currentTask.targetPos.equals(pos)) return;
@@ -165,8 +165,6 @@ public class AutoFillerStateMachine {
         }
 
         if (allMatched) {
-            // 🚀 核心修复 2：在机器人关上 GUI 的前一微秒，强制执行一次全局抓拍更新缓存！
-            // 彻底杜绝关箱子太快导致缓存没跟上的情况。
             if (client.currentScreen instanceof HandledScreen<?> hs) {
                 RealContainerCache.updateFromScreen(client, hs);
             }
@@ -185,8 +183,6 @@ public class AutoFillerStateMachine {
             client.player.sendMessage(Text.translatable(key), true);
         }
     }
-
-    // ... [中间的潜影盒和物品挪动逻辑保持不变] ...
 
     private void queueSmartShulkerExtraction(MinecraftClient client, int shulkerSlot, int itemInShulker, ItemStack targetItem) {
         List<Integer> emptyUiSlots = new ArrayList<>();

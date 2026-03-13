@@ -55,7 +55,6 @@ public class Callbacks implements IHotkeyCallback {
             AreaScanner.executeScan(mc);
         } else if (mc.crosshairTarget instanceof BlockHitResult bhr) {
             BlockPos pos = bhr.getBlockPos();
-            // 🚀 核心修复：传入 getRegistryManager() 而不是 mc.world
             Map<Integer, ItemStack> items = SchematicContainerReader.getRequiredItems(pos, mc.world.getRegistryManager());
             if (items != null && !items.isEmpty()) {
                 AutoFillerStateMachine.getInstance().addTask(pos, items);

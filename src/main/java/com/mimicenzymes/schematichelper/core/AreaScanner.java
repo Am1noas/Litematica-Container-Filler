@@ -34,8 +34,8 @@ public class AreaScanner {
                     BlockState state = schematicWorld.getBlockState(pos);
                     if (state.isAir() || !state.hasBlockEntity()) continue;
 
-                    // 🚀 核心补丁：坐标归一化，终结大箱子开两次的问题！
-                    // 不管扫到大箱子的哪一边，统一将坐标篡改为右半边 (ChestType.RIGHT)
+                    //坐标归一化，解决大箱子开两次的问题
+                    //不管扫到大箱子的哪一边，统一将坐标篡改为右半边(ChestType.RIGHT)
                     if (state.getBlock() instanceof ChestBlock) {
                         ChestType type = state.get(ChestBlock.CHEST_TYPE);
                         if (type == ChestType.LEFT) {
@@ -47,7 +47,7 @@ public class AreaScanner {
                     Map<Integer, ItemStack> required = SchematicContainerReader.getRequiredItems(pos, mc.world.getRegistryManager());
                     if (required == null || required.isEmpty() || RealContainerCache.isSatisfied(pos, required)) continue;
 
-                    // 经过归一化后，大箱子的第二单会在这里被状态机内部的去重逻辑直接拦截！
+                    // 经过归一化后，大箱子的第二单会在这里被状态机内部的去重逻辑直接拦截
                     AutoFillerStateMachine.getInstance().addTask(pos, required);
                     count++;
                 }

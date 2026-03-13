@@ -75,7 +75,6 @@ public class ContainerHighlighter {
                     BlockState state = schematicWorld.getBlockState(pos);
                     if (state.isAir() || !state.hasBlockEntity()) continue;
 
-                    // 🚀 核心修复：传入 getRegistryManager() 而不是 client.world
                     Map<Integer, ItemStack> required = SchematicContainerReader.getRequiredItems(pos, client.world.getRegistryManager());
                     if (required == null || required.isEmpty()) continue;
 
