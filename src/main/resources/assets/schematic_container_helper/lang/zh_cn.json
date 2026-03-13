@@ -1,5 +1,5 @@
 {
-  "schematic_container_helper.gui.title.configs": "容器助手配置",
+  "schematic_container_helper.gui.title.configs": "容器填充机配置",
   "schematic_container_helper.gui.button.feature": "功能设置",
   "schematic_container_helper.gui.button.hotkeys": "热键绑定",
 
@@ -9,7 +9,7 @@
   "schematic_container_helper.config.name.fillRadius": "范围扫描半径",
   "schematic_container_helper.config.name.renderRadius": "高亮渲染半径",
   "schematic_container_helper.config.name.syncLiteLayer": "跟随投影渲染层",
-  "schematic_container_helper.config.name.hideCompletedContainers": "自动隐藏已满容器",
+  "schematic_container_helper.config.name.hideCompletedContainers": "自动隐藏已填充容器",
   "schematic_container_helper.config.name.enableDataSync": "启用数据同步",
   "schematic_container_helper.config.name.highlightContainers": "高亮容器",
   "schematic_container_helper.config.name.highlightXray": "高亮透视",
@@ -41,10 +41,10 @@
   "schematic_container_helper.hotkey.comment.toggleMode": "在“单体准星模式”与“群体范围模式”之间快速切换",
   "schematic_container_helper.hotkey.comment.openConfigGui": "打开此模组配置界面的快捷键 (默认 L + C)",
 
-  "schematic_container_helper.message.fill_success": "§a[容器助手] 容器填充成功！",
-  "schematic_container_helper.message.scan_start": "§b[容器助手] §a找到 %s 个缺货容器，开始填充！",
-  "schematic_container_helper.message.continuous_on": "§a[容器助手] 已开启持续填充",
-  "schematic_container_helper.message.continuous_off": "§c[容器助手] 已关闭持续填充",
-  "schematic_container_helper.message.mode_area": "§e[容器助手] 模式：范围扫描填充",
-  "schematic_container_helper.message.mode_single": "§e[容器助手] 模式：准星单体填充"
+  "schematic_container_helper.message.fill_success": "§a[容器助填充] 容器填充成功！",
+  "schematic_container_helper.message.scan_start": "§b[容器填充] §a找到 %s 个缺货容器，开始填充！",
+  "schematic_container_helper.message.continuous_on": "§a[容器填充] 已开启持续填充",
+  "schematic_container_helper.message.continuous_off": "§c[容器填充] 已关闭持续填充",
+  "schematic_container_helper.message.mode_area": "§e[容器填充] 模式：范围扫描填充",
+  "schematic_container_helper.message.mode_single": "§e[容器填充] 模式：准星单体填充"
 }

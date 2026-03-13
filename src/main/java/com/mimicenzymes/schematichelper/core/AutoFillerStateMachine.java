@@ -24,6 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.text.Text;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class AutoFillerStateMachine {
@@ -31,6 +32,8 @@ public class AutoFillerStateMachine {
     public static class FillTask {
         public final BlockPos targetPos;
         public final Map<Integer, ItemStack> requiredItems;
+        public final Set<Item> missingInAction = new LinkedHashSet<>(); //记录开箱后发现缺少的材料
+
         public FillTask(BlockPos targetPos, Map<Integer, ItemStack> requiredItems) {
             this.targetPos = targetPos;
             this.requiredItems = requiredItems;
@@ -52,17 +55,54 @@ public class AutoFillerStateMachine {
     private int lastOpenedShulkerSlot = -1;
     private final Set<Item> borrowedItems = new HashSet<>();
 
+    //记录缺失的物品ban掉
+    private final Map<BlockPos, Set<Item>> failedContainers = new ConcurrentHashMap<>();
+    private boolean lastContinuousState = false;
+    private int tickCounter = 0;
+
     private AutoFillerStateMachine() {
         this.shulkerExtractor = DependencyChecker.HAS_QUICK_SHULKER ? new QuickShulkerWrapper() : new DummyExtractor();
     }
 
     public void addTask(BlockPos pos, Map<Integer, ItemStack> requiredItems) {
-        // 如果当前正在处理这个箱子，无视新订单
-        if (currentTask != null && currentTask.targetPos.equals(pos)) return;
+        if (failedContainers.containsKey(pos)) return;
 
-        // 如果排队列表里已经有这个箱子了，无视新订单
+        if (currentTask != null && currentTask.targetPos.equals(pos)) return;
         for (FillTask t : taskQueue) {
             if (t.targetPos.equals(pos)) return;
+        }
+
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player != null) {
+            boolean hasAtLeastOneMaterial = false;
+            Set<Item> missingItems = new LinkedHashSet<>(); //按顺序记录所有缺失的物品
+
+            for (ItemStack req : requiredItems.values()) {
+                if (hasItemAnywhere(client, req.getItem())) {
+                    hasAtLeastOneMaterial = true;
+                } else {
+                    missingItems.add(req.getItem());
+                }
+            }
+
+            // 如果一件能用的材料都没有，拦截任务并播报【所有】缺少的材料
+            if (!hasAtLeastOneMaterial && !missingItems.isEmpty()) {
+                failedContainers.put(pos, missingItems);
+
+                StringBuilder sb = new StringBuilder();
+                int count = 0;
+                for (Item item : missingItems) {
+                    if (count > 0) sb.append(", ");
+                    sb.append(item.getName().getString());
+                    count++;
+                    if (count >= 3 && missingItems.size() > 3) {
+                        sb.append(" 等");
+                        break;
+                    }
+                }
+                sendFeedback(client, "§c[材料告急] 缺少: " + sb.toString(), true);
+                return;
+            }
         }
 
         taskQueue.add(new FillTask(pos, requiredItems));
@@ -70,8 +110,32 @@ public class AutoFillerStateMachine {
 
     public boolean isSilentlyExtracting() { return silentlyExtracting; }
 
+    public void clearBlacklist() {
+        failedContainers.clear();
+    }
+
     public void tick(MinecraftClient client) {
         if (client.player == null || client.world == null) { reset(); return; }
+
+        boolean currentContinuousState = Configs.CONTINUOUS_FILL.getBooleanValue();
+        if (currentContinuousState != lastContinuousState) {
+            clearBlacklist();
+            if (!currentContinuousState) {
+                taskQueue.clear();
+            }
+            lastContinuousState = currentContinuousState;
+        }
+
+        tickCounter++;
+        //智能解封
+        if (!failedContainers.isEmpty() && tickCounter % 10 == 0) {
+            failedContainers.entrySet().removeIf(entry -> {
+                for (Item item : entry.getValue()) {
+                    if (hasItemAnywhere(client, item)) return true;
+                }
+                return false;
+            });
+        }
 
         if (currentTask != null) {
             watchdogTimer++;
@@ -158,6 +222,24 @@ public class AutoFillerStateMachine {
                         queueSmartShulkerExtraction(client, result.shulkerPlayerSlot, result.itemSlotInShulker, required);
                         return;
                     }
+
+                    //记录缺失物品并整合播报
+                    failedContainers.computeIfAbsent(currentTask.targetPos, k -> new LinkedHashSet<>()).add(required.getItem());
+                    currentTask.missingInAction.add(required.getItem());
+
+                    StringBuilder sb = new StringBuilder();
+                    int count = 0;
+                    for (Item item : currentTask.missingInAction) {
+                        if (count > 0) sb.append(", ");
+                        sb.append(item.getName().getString());
+                        count++;
+                        if (count >= 3 && currentTask.missingInAction.size() > 3) {
+                            sb.append(" 等");
+                            break;
+                        }
+                    }
+                    sendFeedback(client, "§c[部分告急] 缺少: " + sb.toString(), true);
+
                     if (current.isEmpty()) currentTask.requiredItems.remove(containerSlot);
                     else currentTask.requiredItems.put(containerSlot, current.copy());
                 }
@@ -178,10 +260,26 @@ public class AutoFillerStateMachine {
         }
     }
 
-    private void sendFeedback(MinecraftClient client, String key, boolean ignored) {
+    private void sendFeedback(MinecraftClient client, String text, boolean isActionBar) {
         if (client.player != null) {
-            client.player.sendMessage(Text.translatable(key), true);
+            client.player.sendMessage(Text.literal(text), isActionBar);
         }
+    }
+
+    private boolean hasItemAnywhere(MinecraftClient client, Item targetItem) {
+        for (int i = 0; i < 36; i++) {
+            ItemStack s = client.player.getInventory().getStack(i);
+            if (s.isOf(targetItem)) return true;
+            if (s.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
+                ContainerComponent c = s.get(DataComponentTypes.CONTAINER);
+                if (c != null) {
+                    for (ItemStack inner : c.stream().toList()) {
+                        if (inner.isOf(targetItem)) return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private void queueSmartShulkerExtraction(MinecraftClient client, int shulkerSlot, int itemInShulker, ItemStack targetItem) {
@@ -427,5 +525,8 @@ public class AutoFillerStateMachine {
 
     public BlockPos getCurrentTaskPos() {
         return currentTask != null ? currentTask.targetPos : null;
+    }
+    public boolean isIdle() {
+        return this.currentTask == null && this.actionQueue.isEmpty();
     }
 }

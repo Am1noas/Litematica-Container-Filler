@@ -10,19 +10,26 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.text.Text;
+import java.util.HashMap;
 import java.util.Map;
 
 public class AreaScanner {
-    public static void executeScan(MinecraftClient mc) {
+    private static final Map<BlockPos, Long> ATTEMPT_COOLDOWNS = new HashMap<>();
+
+    public static void executeScan(MinecraftClient mc, boolean isSilentPrinter) {
         if (mc.player == null || mc.world == null) return;
 
         var schematicWorld = SchematicWorldHandler.getSchematicWorld();
-        if (schematicWorld == null) return;
+        if (schematicWorld == null) {
+            if (!isSilentPrinter) mc.player.sendMessage(Text.literal("§c[投影容器填充机] 未加载投影世界！"), true); // 改为 true
+            return;
+        }
 
         BlockPos center = mc.player.getBlockPos();
         int r = Configs.FILL_RADIUS.getIntegerValue();
         boolean syncLayer = Configs.SYNC_LITE_LAYER.getBooleanValue();
         int count = 0;
+        long now = System.currentTimeMillis();
 
         for (int x = -r; x <= r; x++) {
             for (int y = -r; y <= r; y++) {
@@ -34,8 +41,6 @@ public class AreaScanner {
                     BlockState state = schematicWorld.getBlockState(pos);
                     if (state.isAir() || !state.hasBlockEntity()) continue;
 
-                    //坐标归一化，解决大箱子开两次的问题
-                    //不管扫到大箱子的哪一边，统一将坐标篡改为右半边(ChestType.RIGHT)
                     if (state.getBlock() instanceof ChestBlock) {
                         ChestType type = state.get(ChestBlock.CHEST_TYPE);
                         if (type == ChestType.LEFT) {
@@ -44,18 +49,26 @@ public class AreaScanner {
                         }
                     }
 
+                    if (isSilentPrinter && ATTEMPT_COOLDOWNS.containsKey(pos) && now - ATTEMPT_COOLDOWNS.get(pos) < 5000) {
+                        continue;
+                    }
+
                     Map<Integer, ItemStack> required = SchematicContainerReader.getRequiredItems(pos, mc.world.getRegistryManager());
                     if (required == null || required.isEmpty() || RealContainerCache.isSatisfied(pos, required)) continue;
 
-                    // 经过归一化后，大箱子的第二单会在这里被状态机内部的去重逻辑直接拦截
                     AutoFillerStateMachine.getInstance().addTask(pos, required);
+                    ATTEMPT_COOLDOWNS.put(pos, now);
                     count++;
                 }
             }
         }
 
-        if (count > 0) {
-            mc.player.sendMessage(Text.translatable("schematic_container_helper.message.scan_start", count), true);
+        if (!isSilentPrinter) {
+            if (count > 0) {
+                mc.player.sendMessage(Text.literal("§a[投影容器扫描] 发现 " + count + " 个缺货容器，开始添加任务..."), true); // 改为 true
+            } else {
+                mc.player.sendMessage(Text.literal("§e[投影容器填充机] 扫描完毕，周围没有需要填充的缺货容器！"), true); // 改为 true
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ import com.mimicenzymes.schematichelper.config.GuiConfigs;
 import com.mimicenzymes.schematichelper.config.Hotkeys;
 import com.mimicenzymes.schematichelper.core.AreaScanner;
 import com.mimicenzymes.schematichelper.core.AutoFillerStateMachine;
+import com.mimicenzymes.schematichelper.core.RealContainerCache;
 import com.mimicenzymes.schematichelper.core.SchematicContainerReader;
 import fi.dy.masa.malilib.gui.GuiBase;
 import fi.dy.masa.malilib.hotkeys.IHotkeyCallback;
@@ -13,6 +14,7 @@ import fi.dy.masa.malilib.hotkeys.KeyAction;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.text.Text;
 import java.util.Map;
@@ -26,7 +28,6 @@ public class Callbacks implements IHotkeyCallback {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (action != KeyAction.PRESS) return false;
 
-        // 1. 打开菜单
         if (key == Hotkeys.OPEN_CONFIG_GUI.getKeybind()) {
             GuiBase.openGui(new GuiConfigs(null));
             return true;
@@ -34,18 +35,17 @@ public class Callbacks implements IHotkeyCallback {
 
         if (mc.player == null) return false;
 
-        // 2. 模组总开关拦截（如果有按键按了，但模组关了，弹出红字警告）
         if (!Configs.ENABLE_MOD.getBooleanValue()) {
             if (key == Hotkeys.FILL_CONTAINER.getKeybind() ||
                     key == Hotkeys.TOGGLE_CONTINUOUS.getKeybind() ||
                     key == Hotkeys.TOGGLE_MODE.getKeybind()) {
-                mc.player.sendMessage(Text.literal("§c[容器助手] 模组当前已停用，快捷键无效！"), true);
+                mc.player.sendMessage(Text.literal("§c[投影容器填充机] 模组当前已停用，快捷键无效！"), true); // 改为 true，显示在动作栏
             }
             return false;
         }
 
-        // 3. 业务逻辑，极速内存 == 比对
         if (key == Hotkeys.FILL_CONTAINER.getKeybind()) {
+            AutoFillerStateMachine.getInstance().clearBlacklist();
             executeFill(mc);
             return true;
         } else if (key == Hotkeys.TOGGLE_CONTINUOUS.getKeybind()) {
@@ -65,14 +65,25 @@ public class Callbacks implements IHotkeyCallback {
 
     private void executeFill(MinecraftClient mc) {
         if (Configs.AREA_MODE.getBooleanValue()) {
-            AreaScanner.executeScan(mc);
-        } else if (mc.crosshairTarget instanceof BlockHitResult bhr) {
-            BlockPos pos = bhr.getBlockPos();
-            Map<Integer, ItemStack> items = SchematicContainerReader.getRequiredItems(pos, mc.world.getRegistryManager());
-            if (items != null && !items.isEmpty()) {
-                AutoFillerStateMachine.getInstance().addTask(pos, items);
+            AreaScanner.executeScan(mc, false);
+        } else {
+            if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+                BlockHitResult bhr = (BlockHitResult) mc.crosshairTarget;
+                BlockPos pos = bhr.getBlockPos();
+                Map<Integer, ItemStack> items = SchematicContainerReader.getRequiredItems(pos, mc.world.getRegistryManager());
+
+                if (items != null && !items.isEmpty()) {
+                    if (!RealContainerCache.isSatisfied(pos, items)) {
+                        AutoFillerStateMachine.getInstance().addTask(pos, items);
+                        mc.player.sendMessage(Text.literal("§a[投影容器填充机] 正在添加单体填充任务..."), true);
+                    } else {
+                        mc.player.sendMessage(Text.literal("§e[投影容器填充机] 该容器已经满足投影要求，无需填充。"), true);
+                    }
+                } else {
+                    mc.player.sendMessage(Text.literal("§e[投影容器填充机] 准星指向的容器没有投影要求。"), true);
+                }
             } else {
-                mc.player.sendMessage(Text.literal("§e[容器助手] 准星处没有缺货的投影容器"), true);
+                mc.player.sendMessage(Text.literal("§c[投影容器填充机] 请将准星准确对准一个容器方块！"), true);
             }
         }
     }
