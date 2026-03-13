@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="src/main/resources/assets/schematic_container_helper/icon.png" width="128" height="128" alt="Mod Icon">
+  <img src="src/main/resources/assets/schematic_container_filler/icon.png" width="128" height="128" alt="Mod Icon">
   <h1> Schematic Container Filler </h1>
 </div>
 

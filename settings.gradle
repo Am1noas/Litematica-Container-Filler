@@ -4,4 +4,4 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = 'schematic_container_helper'
+rootProject.name = 'schematic_container_filler'

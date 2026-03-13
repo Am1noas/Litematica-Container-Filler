@@ -1,24 +1,24 @@
 {
   "schemaVersion": 1,
-  "id": "schematic_container_helper",
+  "id": "schematic_container_filler",
   "version": "0.3",
   "name": "投影容器填充机",
   "description": "自动投影容器填充模组",
   "authors": ["MimicEnzymes"],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/schematic_container_helper/icon.png",
+  "icon": "assets/schematic_container_filler/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.mimicenzymes.schematichelper.SchematicHelperClient"
+      "com.mimicenzymes.schematicfiller.SchematicfillerClient"
     ],
     "modmenu": [
-      "com.mimicenzymes.schematichelper.config.ModMenuIntegration"
+      "com.mimicenzymes.schematicfiller.config.ModMenuIntegration"
     ]
   },
   "mixins": [
-    "schematic_container_helper.mixins.json"
+    "schematic_container_filler.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.15.11",
