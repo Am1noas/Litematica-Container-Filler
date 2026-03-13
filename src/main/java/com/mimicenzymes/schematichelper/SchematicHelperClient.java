@@ -1,12 +1,10 @@
 package com.mimicenzymes.schematichelper;
 
 import com.mimicenzymes.schematichelper.config.ConfigHandler;
-import com.mimicenzymes.schematichelper.config.Hotkeys;
 import com.mimicenzymes.schematichelper.core.AutoFillerStateMachine;
 import com.mimicenzymes.schematichelper.core.ContainerHighlighter;
 import com.mimicenzymes.schematichelper.core.SchematicChangeListener;
-import com.mimicenzymes.schematichelper.core.RealContainerCache; // 🚀 新增导入
-import com.mimicenzymes.schematichelper.input.Callbacks;
+import com.mimicenzymes.schematichelper.core.RealContainerCache;
 import com.mimicenzymes.schematichelper.input.InputHandler;
 
 import fi.dy.masa.malilib.config.ConfigManager;
