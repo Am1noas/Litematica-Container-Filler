@@ -28,10 +28,8 @@ public class SchematicContainerReader {
             if (type != ChestType.SINGLE) {
                 Direction facing = state.get(ChestBlock.FACING);
                 Direction otherHalfDir = (type == ChestType.LEFT) ? facing.rotateYClockwise() : facing.rotateYCounterclockwise();
-
-                // 🚀 核心大修复：强制统一大箱子的合并顺序！
-                // 不管传入的是哪一半，永远让 ChestType.RIGHT 作为上半部分(0-26)，ChestType.LEFT 作为下半部分(27-53)
-                // 这完美匹配了原版大箱子 GUI 的底层逻辑
+                //不管传入的是哪一半，永远让ChestType.RIGHT作为上半部分(0-26)，ChestType.LEFT作为下半部分(27-53)
+                //这完美匹配了原版大箱子 GUI 的底层逻辑
                 BlockPos rightPos = (type == ChestType.RIGHT) ? worldPos : worldPos.offset(otherHalfDir);
                 BlockPos leftPos = (type == ChestType.LEFT) ? worldPos : worldPos.offset(otherHalfDir);
 
