@@ -31,7 +31,7 @@ public class LitematicafillerClient implements ClientModInitializer {
 
     private static boolean isGuiAutoRegistered = false;
     private static int printerTickTimer = 0;
-    //防鬼畜冷却器
+    //防鬼畜
     private static final Map<BlockPos, Long> CROSSHAIR_COOLDOWNS = new HashMap<>();
 
     @Override
@@ -57,7 +57,7 @@ public class LitematicafillerClient implements ClientModInitializer {
 
                 if (Configs.CONTINUOUS_FILL.getBooleanValue() && AutoFillerStateMachine.getInstance().isIdle()) {
                     printerTickTimer++;
-                    if (printerTickTimer >= 10) { // 每 0.5 秒判定一次
+                    if (printerTickTimer >= 10) { //每 0.5 秒判定一次
                         printerTickTimer = 0;
 
                         if (Configs.AREA_MODE.getBooleanValue()) {

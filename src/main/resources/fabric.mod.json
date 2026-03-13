@@ -11,7 +11,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.mimicenzymes.litematicafiller.LitematicaFillerClient"
+      "com.mimicenzymes.litematicafiller.LitematicafillerClient"
     ],
     "modmenu": [
       "com.mimicenzymes.litematicafiller.config.ModMenuIntegration"

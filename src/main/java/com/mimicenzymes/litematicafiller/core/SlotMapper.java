@@ -21,8 +21,7 @@ public class SlotMapper {
         //遍历当前界面里的每一个格子
         for (int uiSlotId = 0; uiSlotId < handler.slots.size(); uiSlotId++) {
             Slot slot = handler.slots.get(uiSlotId);
-            
-            //防御性编程：忽略某些Mod生成的没有实际Inventory绑定的装饰性假格子
+
             if (slot.inventory == null) continue;
 
             if (slot.inventory == playerInv) {

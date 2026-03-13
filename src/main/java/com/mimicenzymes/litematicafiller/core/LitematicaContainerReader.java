@@ -84,7 +84,6 @@ public class LitematicaContainerReader {
 
                 result.result().ifPresent(stack -> {
                     if (!stack.isEmpty()) {
-                        // 🚀 这里使用刚才定义的 finalSlot，红线消失！
                         items.put(finalSlot, stack);
                     }
                 });
