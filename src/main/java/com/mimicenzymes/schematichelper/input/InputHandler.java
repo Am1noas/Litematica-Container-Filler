@@ -16,6 +16,7 @@ public class InputHandler implements IKeybindProvider {
             hotkey.getKeybind().setCallback(Callbacks.getInstance());
         }
     }
+
     @Override
     public void addHotkeys(IKeybindManager manager) {
     }

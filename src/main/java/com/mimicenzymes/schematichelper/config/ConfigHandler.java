@@ -2,7 +2,6 @@ package com.mimicenzymes.schematichelper.config;
 
 import fi.dy.masa.malilib.config.ConfigUtils;
 import fi.dy.masa.malilib.config.IConfigHandler;
-import fi.dy.masa.malilib.event.InputEventHandler;
 import fi.dy.masa.malilib.util.JsonUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import com.google.gson.JsonElement;
