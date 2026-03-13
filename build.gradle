@@ -6,7 +6,6 @@ plugins {
 version = project.mod_version
 group = project.maven_group
 
-// --- 仓库配置区（注意这里的括号必须闭合！） ---
 repositories {
     flatDir {
         dirs 'libs'
@@ -18,7 +17,6 @@ repositories {
     mavenCentral()
 }
 
-// --- 依赖配置区 ---
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
