@@ -11,7 +11,7 @@ import com.google.gson.JsonObject;
 import java.io.File;
 
 public class ConfigHandler implements IConfigHandler {
-    private static final String CONFIG_FILE_NAME = "schematic_container_filler.json";
+    private static final String CONFIG_FILE_NAME = "litematica_container_filler.json";
 
     @Override
     public void load() {

@@ -48,5 +48,7 @@
   "litematica_container_filler.message.timeout_reset": "§cOperation timed out, resetting state...",
   "litematica_container_filler.message.cursor_stuck": "§cCursor stuck, please clear your inventory manually",
   "litematica_container_filler.message.no_litematica_world": "§c[Container Filler] No litematica world detected!",
+  "litematica_container_filler.message.task_dispatched": "§b[Container Filler] §aTask dispatched...",
+  "litematica_container_filler.message.already_satisfied": "§7[§bContainer Filler§7] §aTarget container already satisfied",
   "litematica_container_filler.message.no_requirements": "§7[§bContainer Filler§7] §eNo missing items found in this area"
 }

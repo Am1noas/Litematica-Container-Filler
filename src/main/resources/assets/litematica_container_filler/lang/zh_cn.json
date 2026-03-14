@@ -48,6 +48,7 @@
   "litematica_container_filler.message.timeout_reset": "§c操作超时，自动重置状态",
   "litematica_container_filler.message.cursor_stuck": "§c鼠标卡住，请手动清理物品栏",
   "litematica_container_filler.message.no_litematica_world": "§c[容器填充] 未检测到已加载的投影世界",
+  "litematica_container_filler.message.task_dispatched": "§b[容器填充] §a开始执行填充任务...",
+  "litematica_container_filler.message.already_satisfied": "§7[§b投影填充机§7] §a目标容器已满足条件",
   "litematica_container_filler.message.no_requirements": "§7[§b投影填充机§7] §e该区域没有需要填充的容器"
-}
 }

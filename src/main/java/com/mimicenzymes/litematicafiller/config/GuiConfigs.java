@@ -12,7 +12,7 @@ public class GuiConfigs extends GuiConfigsBase {
     private ConfigGuiTab tab = ConfigGuiTab.FEATURE;
 
     public GuiConfigs(Screen parent) {
-        super(10, 50, LitematicafillerClient.MOD_ID, parent, "schematic_container_filler.gui.title.configs");
+        super(10, 50, LitematicafillerClient.MOD_ID, parent, "litematica_container_filler.gui.title.configs");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class GuiConfigs extends GuiConfigsBase {
         this.clearOptions();
         int x = 10;
         for (ConfigGuiTab t : ConfigGuiTab.values()) {
-            String tabName = fi.dy.masa.malilib.util.StringUtils.translate("schematic_container_filler.gui.button." + t.name().toLowerCase());
+            String tabName = fi.dy.masa.malilib.util.StringUtils.translate("litematica_container_filler.gui.button." + t.name().toLowerCase());
             ButtonGeneric b = new ButtonGeneric(x, 26, -1, 20, tabName);
             b.setEnabled(this.tab != t);
             this.addButton(b, (button, mouseButton) -> { this.tab = t; this.initGui(); });

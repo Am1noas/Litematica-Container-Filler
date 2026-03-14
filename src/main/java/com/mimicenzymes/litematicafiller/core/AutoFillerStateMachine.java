@@ -14,7 +14,9 @@ import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.CrafterScreenHandler;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -54,6 +56,7 @@ public class AutoFillerStateMachine {
 
     private int lastOpenedShulkerSlot = -1;
     private final Set<Item> borrowedItems = new HashSet<>();
+    private final Map<Integer, Long> pendingCrafterToggles = new HashMap<>();
 
     //记录缺失的物品ban掉
     private final Map<BlockPos, Set<Item>> failedContainers = new ConcurrentHashMap<>();
@@ -75,7 +78,7 @@ public class AutoFillerStateMachine {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
             boolean hasAtLeastOneMaterial = false;
-            Set<Item> missingItems = new LinkedHashSet<>(); //按顺序记录所有缺失的物品
+            Set<Item> missingItems = new LinkedHashSet<>();
 
             for (ItemStack req : requiredItems.values()) {
                 if (hasItemAnywhere(client, req.getItem())) {
@@ -85,7 +88,6 @@ public class AutoFillerStateMachine {
                 }
             }
 
-            // 如果一件能用的材料都没有，拦截任务并播报【所有】缺少的材料
             if (!hasAtLeastOneMaterial && !missingItems.isEmpty()) {
                 failedContainers.put(pos, missingItems);
 
@@ -100,7 +102,7 @@ public class AutoFillerStateMachine {
                         break;
                     }
                 }
-                sendFeedback(client, Text.translatable("schematic_container_filler.message.material_shortage", sb.toString()).getString(), true);
+                sendFeedback(client, Text.translatable("litematica_container_filler.message.material_shortage", sb.toString()).getString(), true);
                 return;
             }
         }
@@ -140,7 +142,7 @@ public class AutoFillerStateMachine {
         if (currentTask != null) {
             watchdogTimer++;
             if (watchdogTimer > 100) {
-                sendFeedback(client, Text.translatable("schematic_container_filler.message.timeout_reset").getString(), true);
+                sendFeedback(client, Text.translatable("litematica_container_filler.message.timeout_reset").getString(), true);
                 reset();
                 return;
             }
@@ -173,17 +175,51 @@ public class AutoFillerStateMachine {
 
         if (!handler.getCursorStack().isEmpty()) {
             if (!tryPlaceCursorItem(client, handler)) {
-                sendFeedback(client, Text.translatable("schematic_container_filler.message.cursor_stuck").getString(), true);
+                sendFeedback(client, Text.translatable("litematica_container_filler.message.cursor_stuck").getString(), true);
                 reset(); return;
             }
             if (delay > 0) { actionWaitTicks = delay; return; }
         }
 
+        if (handler instanceof CrafterScreenHandler crafterHandler && client.currentScreen instanceof HandledScreen<?> handledScreen) {
+            Set<Integer> targetDisabled = LitematicaContainerReader.getDisabledSlots(currentTask.targetPos);
+            boolean toggledInThisTick = false;
+
+            for (int i = 0; i < 9; i++) {
+                boolean shouldBeDisabled = targetDisabled != null && targetDisabled.contains(i);
+                boolean isCurrentlyDisabled = crafterHandler.isSlotDisabled(i);
+
+                if (shouldBeDisabled != isCurrentlyDisabled) {
+                    if (crafterHandler.getSlot(i).hasStack()) {
+                        simulateSlotClick(handledScreen, crafterHandler.getSlot(i), i, 0, SlotActionType.QUICK_MOVE);
+                    } else {
+                        simulateSlotClick(handledScreen, crafterHandler.getSlot(i), i, 0, SlotActionType.PICKUP);
+                    }
+                    toggledInThisTick = true;
+                    if (delay > 0) break;
+                }
+            }
+            if (toggledInThisTick) {
+                actionWaitTicks = Math.max(delay, 1);
+                if (delay > 0) return;
+            }
+        }
+
         boolean allMatched = true;
         int containerSize = handler.slots.size() - 36;
+
+        if (handler instanceof net.minecraft.screen.CrafterScreenHandler) {
+            containerSize = 9;
+        }
+
         if (containerSize <= 0) { reset(); return; }
 
         for (int containerSlot = 0; containerSlot < containerSize; containerSlot++) {
+
+            if (handler instanceof CrafterScreenHandler ch && ch.isSlotDisabled(containerSlot)) {
+                continue;
+            }
+
             int uiSlot = currentMapper.getUiSlotForContainer(containerSlot);
             if (uiSlot == -1 || uiSlot >= handler.slots.size()) continue;
 
@@ -223,7 +259,6 @@ public class AutoFillerStateMachine {
                         return;
                     }
 
-                    //记录缺失物品并整合播报
                     failedContainers.computeIfAbsent(currentTask.targetPos, k -> new LinkedHashSet<>()).add(required.getItem());
                     currentTask.missingInAction.add(required.getItem());
 
@@ -238,7 +273,7 @@ public class AutoFillerStateMachine {
                             break;
                         }
                     }
-                    sendFeedback(client, Text.translatable("schematic_container_filler.message.fill_success").getString(), true);
+                    sendFeedback(client, Text.translatable("litematica_container_filler.message.fill_success").getString(), true);
 
                     if (current.isEmpty()) currentTask.requiredItems.remove(containerSlot);
                     else currentTask.requiredItems.put(containerSlot, current.copy());
@@ -528,5 +563,37 @@ public class AutoFillerStateMachine {
     }
     public boolean isIdle() {
         return this.currentTask == null && this.actionQueue.isEmpty();
+    }
+
+    private void simulateSlotClick(HandledScreen<?> screen, Slot slot, int slotId, int button, SlotActionType actionType) {
+        try {
+            java.lang.reflect.Method targetMethod = null;
+            Class<?> currClass = screen.getClass();
+            while (currClass != null && targetMethod == null) {
+                for (java.lang.reflect.Method m : currClass.getDeclaredMethods()) {
+                    Class<?>[] params = m.getParameterTypes();
+                    if (params.length == 4
+                            && params[0] == Slot.class
+                            && params[1] == int.class
+                            && params[2] == int.class
+                            && params[3] == SlotActionType.class) {
+                        targetMethod = m;
+                        break;
+                    }
+                }
+                currClass = currClass.getSuperclass();
+            }
+
+            if (targetMethod != null) {
+                targetMethod.setAccessible(true);
+                //强制触发GUI上的鼠标点击
+                targetMethod.invoke(screen, slot, slotId, button, actionType);
+            } else {
+                //如果找不到，兜底使用发包模式
+                MinecraftClient.getInstance().interactionManager.clickSlot(screen.getScreenHandler().syncId, slotId, button, actionType, MinecraftClient.getInstance().player);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

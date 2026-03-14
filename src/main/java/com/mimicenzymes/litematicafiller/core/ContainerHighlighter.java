@@ -4,6 +4,7 @@ import com.mimicenzymes.litematicafiller.config.Configs;
 import fi.dy.masa.malilib.util.data.Color4f;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.CrafterBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -76,10 +77,11 @@ public class ContainerHighlighter {
                     if (state.isAir() || !state.hasBlockEntity()) continue;
 
                     Map<Integer, ItemStack> required = LitematicaContainerReader.getRequiredItems(pos, client.world.getRegistryManager());
-                    if (required == null || required.isEmpty()) continue;
-
-                    if (hideCompleted && RealContainerCache.isSatisfied(pos, required)) continue;
-
+                    boolean isCrafter = state.getBlock() instanceof net.minecraft.block.CrafterBlock;
+                    boolean hasJob = (required != null && !required.isEmpty()) || isCrafter;
+                    if (!hasJob) continue;
+                    boolean allSatisfied = RealContainerCache.isSatisfied(pos, required);
+                    if (hideCompleted && allSatisfied) continue;
                     MISSING_LIST.add(pos.toImmutable());
                 }
             }

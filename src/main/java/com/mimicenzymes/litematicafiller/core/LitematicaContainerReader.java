@@ -5,14 +5,19 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.ChestType;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class LitematicaContainerReader {
 
@@ -56,6 +61,51 @@ public class LitematicaContainerReader {
         }
         return items;
     }
+
+    public static Set<Integer> getDisabledSlots(BlockPos worldPos) {
+        var schematicWorld = SchematicWorldHandler.getSchematicWorld();
+        if (schematicWorld == null) return Collections.emptySet();
+
+        BlockEntity blockEntity = schematicWorld.getBlockEntity(worldPos);
+        if (blockEntity == null) return Collections.emptySet();
+
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.world == null) return Collections.emptySet();
+
+        NbtCompound nbt = blockEntity.createNbt(client.world.getRegistryManager());
+        return parseDisabledSlots(nbt);
+    }
+
+    public static boolean doesCrafterNeedLocking(BlockPos pos, MinecraftClient client) {
+        Set<Integer> schematicLocks = getDisabledSlots(pos);
+        Set<Integer> cachedLocks = RealContainerCache.getCachedLocks(pos);
+        if (cachedLocks != null) return !schematicLocks.equals(cachedLocks);
+
+        BlockEntity realEntity = client.world.getBlockEntity(pos);
+        if (realEntity == null) return true;
+        return !schematicLocks.equals(parseDisabledSlots(realEntity.createNbt(client.world.getRegistryManager())));
+    }
+    private static Set<Integer> parseDisabledSlots(NbtCompound nbt) {
+        Set<Integer> disabledSlots = new java.util.HashSet<>();
+        if (nbt != null && nbt.contains("disabled_slots")) {
+            net.minecraft.nbt.NbtElement elem = nbt.get("disabled_slots");
+
+            if (elem instanceof net.minecraft.nbt.NbtList list) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i) instanceof net.minecraft.nbt.AbstractNbtNumber num) {
+                        disabledSlots.add(num.intValue());
+                    }
+                }
+            }
+            else if (elem instanceof net.minecraft.nbt.NbtIntArray intArray) {
+                for (int val : intArray.getIntArray()) {
+                    disabledSlots.add(val);
+                }
+            }
+        }
+        return disabledSlots;
+    }
+
     public static Map<Integer, ItemStack> getRequiredItemsFromNbt(net.minecraft.nbt.NbtCompound nbt, net.minecraft.registry.DynamicRegistryManager registryManager) {
         if (!nbt.contains("Items")) return null;
 

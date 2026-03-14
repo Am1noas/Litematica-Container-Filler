@@ -21,7 +21,7 @@ public class AreaScanner {
 
         var schematicWorld = SchematicWorldHandler.getSchematicWorld();
         if (schematicWorld == null) {
-            if (!isSilentPrinter) mc.player.sendMessage(Text.translatable("schematic_container_filler.message.no_schematic_world"), true);
+            if (!isSilentPrinter) mc.player.sendMessage(Text.translatable("litematica_container_filler.message.no_schematic_world"), true);
             return;
         }
 
@@ -54,9 +54,14 @@ public class AreaScanner {
                     }
 
                     Map<Integer, ItemStack> required = LitematicaContainerReader.getRequiredItems(pos, mc.world.getRegistryManager());
-                    if (required == null || required.isEmpty() || RealContainerCache.isSatisfied(pos, required)) continue;
 
-                    AutoFillerStateMachine.getInstance().addTask(pos, required);
+                    boolean isCrafter = state.getBlock() instanceof net.minecraft.block.CrafterBlock;
+                    boolean needsLocking = isCrafter && LitematicaContainerReader.doesCrafterNeedLocking(pos, mc);
+                    boolean hasItems = required != null && !required.isEmpty() && !RealContainerCache.isSatisfied(pos, required);
+
+                    if (!hasItems && !needsLocking) continue;
+
+                    AutoFillerStateMachine.getInstance().addTask(pos, required == null ? new HashMap<>() : required);
                     ATTEMPT_COOLDOWNS.put(pos, now);
                     count++;
                 }
@@ -65,9 +70,9 @@ public class AreaScanner {
 
         if (!isSilentPrinter) {
             if (count > 0) {
-                mc.player.sendMessage(Text.translatable("schematic_container_filler.message.scan_start", count), true);
+                mc.player.sendMessage(Text.translatable("litematica_container_filler.message.scan_start", count), true);
             } else {
-                mc.player.sendMessage(Text.translatable("schematic_container_filler.message.no_requirements"), true);
+                mc.player.sendMessage(Text.translatable("litematica_container_filler.message.no_requirements"), true);
             }
         }
     }

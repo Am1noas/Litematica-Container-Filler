@@ -3,11 +3,7 @@ package com.mimicenzymes.litematicafiller;
 import com.mimicenzymes.litematicafiller.config.ConfigHandler;
 import com.mimicenzymes.litematicafiller.config.Configs;
 import com.mimicenzymes.litematicafiller.config.GuiConfigs;
-import com.mimicenzymes.litematicafiller.core.AreaScanner;
-import com.mimicenzymes.litematicafiller.core.AutoFillerStateMachine;
-import com.mimicenzymes.litematicafiller.core.ContainerHighlighter;
-import com.mimicenzymes.litematicafiller.core.LitematicaChangeListener;
-import com.mimicenzymes.litematicafiller.core.RealContainerCache;
+import com.mimicenzymes.litematicafiller.core.*;
 import com.mimicenzymes.litematicafiller.input.InputHandler;
 
 import fi.dy.masa.malilib.config.ConfigManager;
@@ -57,7 +53,7 @@ public class LitematicafillerClient implements ClientModInitializer {
 
                 if (Configs.CONTINUOUS_FILL.getBooleanValue() && AutoFillerStateMachine.getInstance().isIdle()) {
                     printerTickTimer++;
-                    if (printerTickTimer >= 10) { //每 0.5 秒判定一次
+                    if (printerTickTimer >= 10) { //每0.5秒判定一次
                         printerTickTimer = 0;
 
                         if (Configs.AREA_MODE.getBooleanValue()) {
@@ -69,10 +65,19 @@ public class LitematicafillerClient implements ClientModInitializer {
                                 long now = System.currentTimeMillis();
 
                                 if (!CROSSHAIR_COOLDOWNS.containsKey(pos) || now - CROSSHAIR_COOLDOWNS.get(pos) >= 5000) {
-                                    Map<Integer, ItemStack> required = com.mimicenzymes.litematicafiller.core.LitematicaContainerReader.getRequiredItems(pos, client.world.getRegistryManager());
-                                    if (required != null && !required.isEmpty() && !RealContainerCache.isSatisfied(pos, required)) {
-                                        AutoFillerStateMachine.getInstance().addTask(pos, required);
-                                        CROSSHAIR_COOLDOWNS.put(pos, now);
+                                    var schWorld = fi.dy.masa.litematica.world.SchematicWorldHandler.getSchematicWorld();
+
+                                    if (schWorld != null && schWorld.getBlockState(pos).hasBlockEntity()) {
+                                        Map<Integer, ItemStack> required = LitematicaContainerReader.getRequiredItems(pos, client.world.getRegistryManager());
+
+                                        boolean isSatisfied = RealContainerCache.isSatisfied(pos, required);
+                                        boolean isCrafter = client.world.getBlockState(pos).getBlock() instanceof net.minecraft.block.CrafterBlock;
+                                        boolean needsLocking = isCrafter && LitematicaContainerReader.doesCrafterNeedLocking(pos, client);
+
+                                        if (!isSatisfied || needsLocking) {
+                                            AutoFillerStateMachine.getInstance().addTask(pos, required == null ? new java.util.HashMap<>() : required);
+                                            CROSSHAIR_COOLDOWNS.put(pos, now);
+                                        }
                                     }
                                 }
                             }
