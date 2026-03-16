@@ -16,3 +16,7 @@ bin/
 
 # 系统杂物
 .DS_Store
+
+# Minecraft dev caches
+**/loom-cache/
+**/remappedJars/

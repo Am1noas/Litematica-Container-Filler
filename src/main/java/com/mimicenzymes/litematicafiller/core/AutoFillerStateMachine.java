@@ -248,7 +248,7 @@ public class AutoFillerStateMachine {
 
     private static int transactionIdCounter = 0;
     private void requestNbtUpdate(MinecraftClient client, BlockPos pos) {
-        if (!client.isInSingleplayer() && client.player != null && client.player.hasPermissionLevel(2)) {
+        if (!client.isInSingleplayer() && client.player != null && client.player.isCreativeLevelTwoOp()) {
             try {
                 if (Configs.ENABLE_OP_NBT_QUERY.getBooleanValue() && client.getNetworkHandler() != null) {
                     client.getNetworkHandler().sendPacket(new net.minecraft.network.packet.c2s.play.QueryBlockNbtC2SPacket(transactionIdCounter++, pos));

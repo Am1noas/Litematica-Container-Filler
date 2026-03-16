@@ -104,7 +104,7 @@ public class RealContainerCache {
         if (!Configs.ENABLE_OP_NBT_QUERY.getBooleanValue()) return;
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.getNetworkHandler() == null) return;
-        if (!client.player.hasPermissionLevel(2)) return;
+        if (!client.player.isCreativeLevelTwoOp()) return;
 
         int id = transactionCounter++;
         PENDING_NBT_REQUESTS.put(id, pos);
