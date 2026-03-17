@@ -42,7 +42,7 @@ public class HighlightRenderer {
                     String name = m.getName();
                     String retName = m.getReturnType().getSimpleName();
                     if (name.equals("build") || name.equals("end") || name.equals("buildOrThrow") || retName.contains("Mesh") || retName.contains("Built")) {
-                        m.setAccessible(true); // 【核心破解】强行突破 private 限制！
+                        m.setAccessible(true);
                         meshData = m.invoke(buffer);
                         if (meshData != null) break;
                     }
@@ -64,9 +64,18 @@ public class HighlightRenderer {
 
             if (meshData != null) {
                 for (java.lang.reflect.Method m : ctx.getClass().getMethods()) {
-                    if (m.getName().equals("draw") && m.getParameterCount() == 3) {
-                        m.invoke(ctx, meshData, false, true);
-                        break;
+                    if (m.getName().equals("draw")) {
+                        Class<?>[] pTypes = m.getParameterTypes();
+                        if (pTypes.length > 0 && pTypes[0].isAssignableFrom(meshData.getClass())) {
+                            if (pTypes.length == 1) {
+                                m.invoke(ctx, meshData);
+                                break;
+                            }
+                            else if (pTypes.length == 3 && pTypes[1] == boolean.class && pTypes[2] == boolean.class) {
+                                m.invoke(ctx, meshData, false, true);
+                                break;
+                            }
+                        }
                     }
                 }
 
@@ -83,7 +92,7 @@ public class HighlightRenderer {
         } catch (Throwable e) {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player != null && client.world != null) {
-                if (client.world.getTime() % 60 == 0) { // 每 3 秒发一次，防止刷屏卡死
+                if (client.world.getTime() % 60 == 0) {
                     client.player.sendMessage(net.minecraft.text.Text.literal("§c[容器填充机] 渲染错误: " + e.getMessage()), false);
                 }
             }

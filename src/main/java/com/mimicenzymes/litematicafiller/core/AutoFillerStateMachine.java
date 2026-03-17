@@ -141,7 +141,7 @@ public class AutoFillerStateMachine {
 
             ServerPlayerEntity serverPlayer = client.getServer().getPlayerManager().getPlayer(client.player.getUuid());
             if (serverPlayer != null) {
-                ServerWorld serverWorld = (ServerWorld) serverPlayer.getEntityWorld();
+                ServerWorld serverWorld = (ServerWorld) serverPlayer.getWorld();
 
                 if (serverWorld != null) {
                     net.minecraft.block.BlockState clientState = client.world.getBlockState(finalPos);
