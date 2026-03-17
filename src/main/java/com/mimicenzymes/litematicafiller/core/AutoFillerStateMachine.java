@@ -105,7 +105,11 @@ public class AutoFillerStateMachine {
         this.shulkerExtractor = DependencyChecker.HAS_QUICK_SHULKER ? new QuickShulkerWrapper() : new DummyExtractor();
     }
 
+    // 【核心修改 1】安全延迟控制：如果关闭开关，所有界面过渡等待归零
     private int getDelay(int baseTicks) {
+        if (!Configs.ENABLE_SAFETY_DELAY.getBooleanValue()) {
+            return 0;
+        }
         return baseTicks + Configs.FILL_DELAY.getIntegerValue();
     }
 
@@ -355,7 +359,7 @@ public class AutoFillerStateMachine {
                 sb.append(item.getName().getString());
                 count++;
                 if (count >= 3 && missingTypes.size() > 3) {
-                    sb.append(" 等");
+                    sb.append(Text.translatable("litematica_container_filler.message.etc").getString());
                     break;
                 }
             }
@@ -978,9 +982,10 @@ public class AutoFillerStateMachine {
         abortTask(client, "litematica_container_filler.message.inventory_full_cannot_extract");
     }
 
+    // 【核心修改 2】如果关闭延迟，delay 为 0，break 的条件永远无法满足，一次遍历清空整个容器！
     private void executeBurstFill(MinecraftClient client, ScreenHandler handler) {
         int syncId = handler.syncId;
-        int delay = Configs.FILL_DELAY.getIntegerValue();
+        int delay = Configs.ENABLE_SAFETY_DELAY.getBooleanValue() ? Configs.FILL_DELAY.getIntegerValue() : 0;
 
         if (!handler.getCursorStack().isEmpty()) {
             if (!tryPlaceCursorItem(client, handler)) {
