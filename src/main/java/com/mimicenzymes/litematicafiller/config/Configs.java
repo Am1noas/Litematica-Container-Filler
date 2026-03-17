@@ -1,6 +1,7 @@
 package com.mimicenzymes.litematicafiller.config;
 
 import com.google.common.collect.ImmutableList;
+import com.mimicenzymes.litematicafiller.dependency.DependencyChecker;
 import fi.dy.masa.malilib.config.IConfigBase;
 import fi.dy.masa.malilib.config.options.ConfigBoolean;
 import fi.dy.masa.malilib.config.options.ConfigColor;
@@ -40,18 +41,29 @@ public class Configs {
     public static final ConfigColor HIGHLIGHT_COLOR_SATISFIED = new ConfigColor("litematica_container_filler.config.name.highlightColorSatisfied", "0x8033FF33", "litematica_container_filler.config.comment.highlightColorSatisfied");
     public static final ConfigColor HIGHLIGHT_COLOR_UNKNOWN = new ConfigColor("litematica_container_filler.config.name.highlightColorUnknown", "0x80FFA500", "litematica_container_filler.config.comment.highlightColorUnknown");
 
-    // 此处的排列顺序决定了游戏内GUI菜单中条目的显示顺序
-    public static final List<IConfigBase> OPTIONS = ImmutableList.of(
-            // 核心
-            ENABLE_MOD, CONTINUOUS_FILL, AREA_MODE, FILL_RADIUS, FILL_DELAY,
-            // 数据
-            ENABLE_DATA_SYNC, ENABLE_OP_NBT_QUERY,
-            // 物流
-            ENABLE_QS_EXTRACTION, AUTO_STASH_ITEMS,
-            // 渲染
-            HIGHLIGHT_CONTAINERS, HIGHLIGHT_XRAY, RENDER_RADIUS, SYNC_LITE_LAYER, HIDE_COMPLETED_CONTAINERS,
-            // 颜色
-            HIGHLIGHT_COLOR_UNFILLED, HIGHLIGHT_COLOR_PARTIAL, HIGHLIGHT_COLOR_OVERFILLED,
-            HIGHLIGHT_COLOR_WRONG, HIGHLIGHT_COLOR_SATISFIED, HIGHLIGHT_COLOR_UNKNOWN
-    );
+    public static final List<IConfigBase> OPTIONS;
+
+    static {
+        ImmutableList.Builder<IConfigBase> builder = ImmutableList.builder();
+
+        // 核心
+        builder.add(ENABLE_MOD, CONTINUOUS_FILL, AREA_MODE, FILL_RADIUS, FILL_DELAY);
+        // 数据
+        builder.add(ENABLE_DATA_SYNC, ENABLE_OP_NBT_QUERY);
+
+        // 物流
+        // 只在检测到安装了 Quick Shulker 时，才向菜单中加入该选项
+        if (DependencyChecker.HAS_QUICK_SHULKER) {
+            builder.add(ENABLE_QS_EXTRACTION);
+        }
+        builder.add(AUTO_STASH_ITEMS, ENABLE_SAFETY_DELAY);
+
+        // 渲染
+        builder.add(HIGHLIGHT_CONTAINERS, HIGHLIGHT_XRAY, RENDER_RADIUS, SYNC_LITE_LAYER, HIDE_COMPLETED_CONTAINERS);
+        // 颜色
+        builder.add(HIGHLIGHT_COLOR_UNFILLED, HIGHLIGHT_COLOR_PARTIAL, HIGHLIGHT_COLOR_OVERFILLED,
+                HIGHLIGHT_COLOR_WRONG, HIGHLIGHT_COLOR_SATISFIED, HIGHLIGHT_COLOR_UNKNOWN);
+
+        OPTIONS = builder.build();
+    }
 }
