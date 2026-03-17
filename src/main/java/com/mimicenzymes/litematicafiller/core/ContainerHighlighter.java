@@ -3,6 +3,7 @@ package com.mimicenzymes.litematicafiller.core;
 import com.mimicenzymes.litematicafiller.render.HighlightRenderer;
 import com.mimicenzymes.litematicafiller.render.HighlightScanner;
 import net.minecraft.client.MinecraftClient;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 
 public class ContainerHighlighter {
 
@@ -10,7 +11,7 @@ public class ContainerHighlighter {
         HighlightScanner.tick(client);
     }
 
-    public static void onRender(Object context) {
-        HighlightRenderer.getInstance().render();
+    public static void onRender(WorldRenderContext context) {
+        HighlightRenderer.getInstance().render(context);
     }
 }

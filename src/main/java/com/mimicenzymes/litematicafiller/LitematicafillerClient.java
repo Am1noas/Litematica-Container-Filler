@@ -92,10 +92,11 @@ public class LitematicafillerClient implements ClientModInitializer {
             }
         });
 
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register((context, hitResult) -> {
             if (com.mimicenzymes.litematicafiller.config.Configs.ENABLE_MOD.getBooleanValue()) {
-                ContainerHighlighter.onRender(context);
+                com.mimicenzymes.litematicafiller.core.ContainerHighlighter.onRender(context);
             }
+            return true;
         });
         InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
     }
