@@ -12,12 +12,17 @@ import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.util.math.BlockPos;
 import com.mojang.blaze3d.systems.RenderSystem;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Map;
 
 public class HighlightRenderer {
     private static final HighlightRenderer INSTANCE = new HighlightRenderer();
     public static HighlightRenderer getInstance() { return INSTANCE; }
+
+    public void render() {
+        render(null);
+    }
 
     public void render(Object context) {
         if (!Configs.ENABLE_MOD.getBooleanValue() || !Configs.HIGHLIGHT_CONTAINERS.getBooleanValue()) return;
@@ -36,6 +41,7 @@ public class HighlightRenderer {
         if (xray) {
             RenderSystem.disableDepthTest();
             RenderSystem.depthMask(false);
+            GL11.glDepthRange(0.0, 0.0);
         } else {
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(true);
@@ -65,7 +71,7 @@ public class HighlightRenderer {
             BufferRenderer.drawWithGlobalProgram(meshData);
             meshData.close();
         } catch (Exception e) {
-            System.err.println("[LitematicaFiller] 渲染致命错误: " + e.getLocalizedMessage());
+            System.err.println("[容器填充] 渲染致命错误: " + e.getLocalizedMessage());
         }
 
         RenderSystem.polygonOffset(0f, 0f);
@@ -74,7 +80,9 @@ public class HighlightRenderer {
         RenderSystem.lineWidth(1.0f);
         RenderSystem.depthMask(true);
         RenderSystem.enableDepthTest();
-        RenderSystem.enableCull();
+        if (xray) {
+            GL11.glDepthRange(0.0, 1.0);
+        }
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
     }
