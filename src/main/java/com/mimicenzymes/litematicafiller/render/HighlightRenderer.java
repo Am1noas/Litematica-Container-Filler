@@ -1,16 +1,12 @@
 package com.mimicenzymes.litematicafiller.render;
 
 import com.mimicenzymes.litematicafiller.config.Configs;
-import fi.dy.masa.malilib.util.data.Color4f; // 【修复】更新为 1.21.6+ MaLiLib 的新版包路径
+import fi.dy.masa.malilib.render.MaLiLibPipelines;
+import fi.dy.masa.malilib.render.RenderContext;
+import fi.dy.masa.malilib.render.RenderUtils;
+import fi.dy.masa.malilib.util.data.Color4f;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
 
 import java.util.Map;
 
@@ -18,73 +14,79 @@ public class HighlightRenderer {
     private static final HighlightRenderer INSTANCE = new HighlightRenderer();
     public static HighlightRenderer getInstance() { return INSTANCE; }
 
-    public void render(WorldRenderContext context) {
+    public void render(Object context) {
         if (!Configs.ENABLE_MOD.getBooleanValue() || !Configs.HIGHLIGHT_CONTAINERS.getBooleanValue()) return;
 
         Map<BlockPos, HighlightState> highlights = HighlightScanner.getHighlights();
         if (highlights.isEmpty()) return;
 
-        VertexConsumerProvider consumers = context.consumers();
-        if (consumers == null) return;
-
         try {
-            MinecraftClient client = MinecraftClient.getInstance();
-            if (client.player == null) return;
+            boolean xray = Configs.HIGHLIGHT_XRAY.getBooleanValue();
 
-            MatrixStack matrices = context.matrixStack();
-            Vec3d cam = context.camera().getPos();
+            RenderContext ctx = new RenderContext(
+                    () -> "litematica_filler_lines",
+                    xray ? MaLiLibPipelines.DEBUG_LINES_MASA_SIMPLE_NO_DEPTH_NO_CULL : MaLiLibPipelines.DEBUG_LINES_MASA_SIMPLE_OFFSET_2
+            );
 
-            RenderLayer lineLayer = RenderLayer.getLines();
-            VertexConsumer buffer = consumers.getBuffer(lineLayer);
+            var buffer = ctx.getBuilder();
+            if (buffer == null) return;
 
             for (Map.Entry<BlockPos, HighlightState> entry : highlights.entrySet()) {
-                drawBox(matrices, buffer, entry.getKey(), cam, getColor(entry.getValue()));
+                Color4f c = getColor(entry.getValue());
+                RenderUtils.drawBlockBoundingBoxOutlinesBatchedLinesSimple(entry.getKey(), c, 0.015, buffer);
             }
 
+            Object meshData = null;
+            for (java.lang.reflect.Method m : buffer.getClass().getMethods()) {
+                if (m.getParameterCount() == 0 && m.getReturnType() != void.class) {
+                    String name = m.getName();
+                    String retName = m.getReturnType().getSimpleName();
+
+                    if (name.equals("build") || name.equals("end") || name.equals("endNullable") || name.equals("buildOrThrow")
+                            || name.equals("method_43428") || name.equals("method_60800")
+                            || retName.contains("Mesh") || retName.contains("Built")) {
+
+                        try {
+                            m.setAccessible(true);
+                            Object result = m.invoke(buffer);
+                            if (result != null) {
+                                meshData = result;
+                                break;
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                }
+            }
+
+            if (meshData != null) {
+                for (java.lang.reflect.Method m : ctx.getClass().getMethods()) {
+                    if (m.getName().equals("draw") && m.getParameterCount() == 3) {
+                        Class<?>[] params = m.getParameterTypes();
+                        if (params[0].isInstance(meshData) && params[1] == boolean.class && params[2] == boolean.class) {
+                            m.invoke(ctx, meshData, false, true);
+                            break;
+                        }
+                    }
+                }
+
+                for (java.lang.reflect.Method m : meshData.getClass().getMethods()) {
+                    if ((m.getName().equals("close") || m.getName().equals("method_43429")) && m.getParameterCount() == 0) {
+                        m.invoke(meshData);
+                        break;
+                    }
+                }
+            }
+
+            ctx.reset();
+
         } catch (Throwable e) {
-
-        }
-    }
-
-    private void drawBox(MatrixStack matrices, VertexConsumer buffer, BlockPos pos, Vec3d cam, Color4f c) {
-        matrices.push();
-        matrices.translate(pos.getX() - cam.x, pos.getY() - cam.y, pos.getZ() - cam.z);
-        Matrix4f model = matrices.peek().getPositionMatrix();
-
-        float s = -0.005f;
-        float e = 1.005f;
-
-        int r = Math.max(0, Math.min(255, (int) (c.r * 255.0f)));
-        int g = Math.max(0, Math.min(255, (int) (c.g * 255.0f)));
-        int b = Math.max(0, Math.min(255, (int) (c.b * 255.0f)));
-        int a = Math.max(0, Math.min(255, (int) (c.a * 255.0f)));
-
-        line(buffer, model, s, s, s, e, s, s, r, g, b, a);
-        line(buffer, model, e, s, s, e, s, e, r, g, b, a);
-        line(buffer, model, e, s, e, s, s, e, r, g, b, a);
-        line(buffer, model, s, s, e, s, s, s, r, g, b, a);
-
-        line(buffer, model, s, e, s, e, e, s, r, g, b, a);
-        line(buffer, model, e, e, s, e, e, e, r, g, b, a);
-        line(buffer, model, e, e, e, s, e, e, r, g, b, a);
-        line(buffer, model, s, e, e, s, e, s, r, g, b, a);
-
-        line(buffer, model, s, s, s, s, e, s, r, g, b, a);
-        line(buffer, model, e, s, s, e, e, s, r, g, b, a);
-        line(buffer, model, e, s, e, e, e, e, r, g, b, a);
-        line(buffer, model, s, s, e, s, e, e, r, g, b, a);
-
-        matrices.pop();
-    }
-
-    private void line(VertexConsumer buffer, Matrix4f model, float x1, float y1, float z1, float x2, float y2, float z2, int r, int g, int b, int a) {
-        try {
-
-            buffer.vertex(model, x1, y1, z1).color(r, g, b, a).normal(0, 1, 0);
-            buffer.vertex(model, x2, y2, z2).color(r, g, b, a).normal(0, 1, 0);
-        } catch (Throwable t) {
-            buffer.vertex(model, x1, y1, z1).color(r, g, b, a);
-            buffer.vertex(model, x2, y2, z2).color(r, g, b, a);
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client != null && client.player != null && client.world != null) {
+                if (client.world.getTime() % 60 == 0) {
+                    client.player.sendMessage(net.minecraft.text.Text.literal("§c[容器填充机] 渲染错误: " + e.getMessage()), false);
+                }
+            }
+            e.printStackTrace();
         }
     }
 
