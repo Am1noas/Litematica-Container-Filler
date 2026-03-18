@@ -10,12 +10,18 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
+import com.mojang.blaze3d.systems.RenderSystem;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Map;
 
 public class HighlightRenderer {
     private static final HighlightRenderer INSTANCE = new HighlightRenderer();
     public static HighlightRenderer getInstance() { return INSTANCE; }
+
+    public void render() {
+        render(new MatrixStack());
+    }
 
     public void render(Object context) {
         if (!Configs.ENABLE_MOD.getBooleanValue() || !Configs.HIGHLIGHT_CONTAINERS.getBooleanValue()) return;
@@ -26,7 +32,7 @@ public class HighlightRenderer {
         MatrixStack matrices = null;
         if (context instanceof MatrixStack) {
             matrices = (MatrixStack) context;
-        } else {
+        } else if (context != null) {
             try {
                 for (java.lang.reflect.Method m : context.getClass().getMethods()) {
                     if (m.getReturnType() == MatrixStack.class) {
@@ -36,16 +42,19 @@ public class HighlightRenderer {
                 }
             } catch (Exception ignored) {}
         }
-        if (matrices == null) return;
+
+        if (matrices == null) {
+            matrices = new MatrixStack();
+        }
 
         try {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player == null) return;
 
             Vec3d cam = client.gameRenderer.getCamera().getPos();
+            boolean xray = Configs.HIGHLIGHT_XRAY.getBooleanValue();
 
             VertexConsumerProvider.Immediate immediate = client.getBufferBuilders().getEntityVertexConsumers();
-
             RenderLayer lineLayer = RenderLayer.getLines();
             VertexConsumer buffer = immediate.getBuffer(lineLayer);
 
@@ -54,9 +63,22 @@ public class HighlightRenderer {
                 drawBox(matrices, buffer, entry.getKey(), cam, c);
             }
 
+            float lineWidth = Math.max(2.5F, (float)client.getWindow().getFramebufferWidth() / 1920.0F * 2.5F);
+            RenderSystem.lineWidth(lineWidth);
+
+            if (xray) {
+                GL11.glDepthRange(0.0, 0.0);
+            }
+
             immediate.draw(lineLayer);
 
+            if (xray) {
+                GL11.glDepthRange(0.0, 1.0);
+            }
+            RenderSystem.lineWidth(1.0F);
+
         } catch (Throwable e) {
+            e.printStackTrace();
         }
     }
 
@@ -65,8 +87,8 @@ public class HighlightRenderer {
         matrices.translate(pos.getX() - cam.x, pos.getY() - cam.y, pos.getZ() - cam.z);
         Matrix4f model = matrices.peek().getPositionMatrix();
 
-        float s = -0.005f;
-        float e = 1.005f;
+        float s = -0.015f;
+        float e = 1.015f;
 
         int r = Math.max(0, Math.min(255, (int) (c.r * 255.0f)));
         int g = Math.max(0, Math.min(255, (int) (c.g * 255.0f)));
@@ -96,8 +118,10 @@ public class HighlightRenderer {
             buffer.vertex(model, x1, y1, z1).color(r, g, b, a).normal(0, 1, 0);
             buffer.vertex(model, x2, y2, z2).color(r, g, b, a).normal(0, 1, 0);
         } catch (Throwable t) {
-            buffer.vertex(model, x1, y1, z1).color(r, g, b, a);
-            buffer.vertex(model, x2, y2, z2).color(r, g, b, a);
+            try {
+                buffer.vertex(model, x1, y1, z1).color(r, g, b, a);
+                buffer.vertex(model, x2, y2, z2).color(r, g, b, a);
+            } catch (Throwable t2) {}
         }
     }
 
