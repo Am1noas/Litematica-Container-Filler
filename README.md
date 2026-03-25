@@ -55,9 +55,7 @@
 ### 运行依赖
 
 -   Minecraft
--   Fabric API
--   MaLiLib
--   Litematica
+-   Fabric API, MaLiLib, Litematica
 
 ---
 <div align="center">Made by MimicEnzymes</div>
