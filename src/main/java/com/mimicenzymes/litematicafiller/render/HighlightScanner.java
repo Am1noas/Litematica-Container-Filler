@@ -40,8 +40,14 @@ public class HighlightScanner {
         }
 
         boolean hideCompleted = Configs.HIDE_COMPLETED_CONTAINERS.getBooleanValue();
+        boolean syncLayer = Configs.SYNC_LITE_LAYER.getBooleanValue();
 
         for (BlockPos pos : HIGHLIGHT_MAP.keySet()) {
+            if (syncLayer && !fi.dy.masa.litematica.data.DataManager.getRenderLayerRange().isPositionWithinRange(pos)) {
+                HIGHLIGHT_MAP.remove(pos);
+                continue;
+            }
+
             BlockState state = schematicWorld.getBlockState(pos);
             if (state.isAir() || !state.hasBlockEntity()) {
                 HIGHLIGHT_MAP.remove(pos);
@@ -53,6 +59,9 @@ public class HighlightScanner {
             if (halves != null) checkPos = halves[0];
 
             Map<Integer, ItemStack> required = LitematicaContainerReader.getRequiredItems(checkPos, client.world.getRegistryManager());
+
+            com.mimicenzymes.litematicafiller.core.MaterialReplacer.replaceInMap(required);
+
             boolean isCrafter = state.getBlock() instanceof net.minecraft.block.CrafterBlock;
             boolean hasJob = (required != null && !required.isEmpty()) || isCrafter;
 
@@ -87,7 +96,6 @@ public class HighlightScanner {
             maxIndex = side * side * side;
         }
 
-        boolean syncLayer = Configs.SYNC_LITE_LAYER.getBooleanValue();
         int r = currentRadius;
         long startTime = System.nanoTime();
         int processed = 0;
@@ -115,6 +123,9 @@ public class HighlightScanner {
             if (halves != null) checkPos = halves[0];
 
             Map<Integer, ItemStack> required = LitematicaContainerReader.getRequiredItems(checkPos, client.world.getRegistryManager());
+
+            com.mimicenzymes.litematicafiller.core.MaterialReplacer.replaceInMap(required);
+
             boolean isCrafter = state.getBlock() instanceof net.minecraft.block.CrafterBlock;
             boolean hasJob = (required != null && !required.isEmpty()) || isCrafter;
 
