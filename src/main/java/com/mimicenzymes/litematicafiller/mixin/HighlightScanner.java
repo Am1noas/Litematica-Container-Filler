@@ -1,9 +1,10 @@
-package com.mimicenzymes.litematicafiller.render;
+package com.mimicenzymes.litematicafiller.mixin;
 
 import com.mimicenzymes.litematicafiller.config.Configs;
 import com.mimicenzymes.litematicafiller.core.ItemMatcher;
 import com.mimicenzymes.litematicafiller.core.LitematicaContainerReader;
 import com.mimicenzymes.litematicafiller.core.RealContainerCache;
+import com.mimicenzymes.litematicafiller.render.HighlightState;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
