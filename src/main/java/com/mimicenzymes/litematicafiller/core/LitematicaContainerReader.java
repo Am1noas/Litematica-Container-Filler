@@ -123,7 +123,7 @@ public class LitematicaContainerReader {
         return disabledSlots;
     }
 
-    public static Map<Integer, ItemStack> getRequiredItemsFromNbt(NbtCompound nbt, net.minecraft.registry.DynamicRegistryManager registryManager) {
+    public static Map<Integer, ItemStack> getRequiredItemsFromNbt(net.minecraft.nbt.NbtCompound nbt, net.minecraft.registry.DynamicRegistryManager registryManager) {
         if (!nbt.contains("Items")) return null;
 
         net.minecraft.nbt.NbtElement rawList = nbt.get("Items");
@@ -133,7 +133,7 @@ public class LitematicaContainerReader {
 
         for (int i = 0; i < itemsList.size(); i++) {
             net.minecraft.nbt.NbtElement element = itemsList.get(i);
-            if (!(element instanceof NbtCompound itemNbt)) continue;
+            if (!(element instanceof net.minecraft.nbt.NbtCompound itemNbt)) continue;
 
             int slot = 0;
             if (itemNbt.contains("Slot")) {
@@ -146,8 +146,8 @@ public class LitematicaContainerReader {
             final int finalSlot = slot;
 
             try {
-                com.mojang.serialization.DataResult<ItemStack> result =
-                        ItemStack.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, itemNbt);
+                com.mojang.serialization.DataResult<net.minecraft.item.ItemStack> result =
+                        net.minecraft.item.ItemStack.CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, itemNbt);
 
                 result.result().ifPresent(stack -> {
                     if (!stack.isEmpty()) {

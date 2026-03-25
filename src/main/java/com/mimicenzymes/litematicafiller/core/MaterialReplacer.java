@@ -19,7 +19,7 @@ import java.util.Map;
 public class MaterialReplacer {
 
     public static boolean isSaving = false;
-    private static boolean isPatching = false; // 防死循环锁
+    private static boolean isPatching = false;
 
     private static class ItemRule {
         final Item item;
@@ -103,6 +103,7 @@ public class MaterialReplacer {
 
         for (Map.Entry<NbtCompound, NbtList> entry : ORIGINAL_ITEMS_BACKUP.entrySet()) {
             entry.getKey().put("Items", entry.getValue().copy());
+            entry.getKey().put("items", entry.getValue().copy());
         }
         ORIGINAL_ITEMS_BACKUP.clear();
 
@@ -120,15 +121,34 @@ public class MaterialReplacer {
             } catch (Exception e) {}
 
             for (NbtCompound nbt : allNbts) {
-                if (nbt.contains("Items")) {
-                    net.minecraft.nbt.NbtElement itemsElem = nbt.get("Items");
+                String targetKey = nbt.contains("Items") ? "Items" : (nbt.contains("items") ? "items" : null);
+                if (targetKey != null) {
+                    net.minecraft.nbt.NbtElement itemsElem = nbt.get(targetKey);
                     if (itemsElem instanceof NbtList list) {
                         ORIGINAL_ITEMS_BACKUP.put(nbt, list.copy());
-                        replaceInNbtList((NbtList) nbt.get("Items"), client.world.getRegistryManager());
+                        replaceInNbtList((NbtList) nbt.get(targetKey), client.world.getRegistryManager());
                     }
                 }
             }
         }
+
+        RealContainerCache.clear();
+
+        try {
+            Class<?> handlerClass = fi.dy.masa.litematica.world.SchematicWorldHandler.class;
+            for (java.lang.reflect.Method m : handlerClass.getMethods()) {
+                String name = m.getName().toLowerCase();
+                if (name.contains("createschematicworld") || name.contains("recreateschematicworld") || name.contains("reload")) {
+                    if (m.getParameterCount() == 0) {
+                        m.invoke(null);
+                        break;
+                    } else if (m.getParameterCount() == 1 && m.getParameterTypes()[0] == boolean.class) {
+                        m.invoke(null, false);
+                        break;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
 
         try { TechUtilsDeceiver.forceTechUtilsUpdate(); } catch (Throwable ignored) {}
     }
@@ -137,7 +157,7 @@ public class MaterialReplacer {
         if (obj == null || depth > 25 || !visited.add(obj)) return;
 
         if (obj instanceof NbtCompound c) {
-            if (c.contains("Items")) results.add(c);
+            if (c.contains("Items") || c.contains("items")) results.add(c);
             for (String key : c.getKeys()) {
                 net.minecraft.nbt.NbtElement el = c.get(key);
                 if (el instanceof NbtCompound child) extractNbtsFromMemory(child, results, visited, depth + 1);
